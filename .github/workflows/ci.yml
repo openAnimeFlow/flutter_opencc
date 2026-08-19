@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: subosito/flutter-action@v2
         with:
@@ -37,14 +37,14 @@ jobs:
           - name: windows-x64
             os: windows-latest
           - name: macos-x64
-            os: macos-13
+            os: macos-15-intel
           - name: macos-arm64
             os: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Checkout OpenCC
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: BYVoid/OpenCC
           ref: ver.1.4.1
@@ -80,16 +80,16 @@ jobs:
     name: Android build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Checkout OpenCC
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: BYVoid/OpenCC
           ref: ver.1.4.1
           path: third_party/opencc
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -116,10 +116,10 @@ jobs:
     name: iOS build
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Checkout OpenCC
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: BYVoid/OpenCC
           ref: ver.1.4.1
