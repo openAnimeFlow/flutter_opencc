@@ -141,4 +141,4 @@ jobs:
           --install build/opencc/ios-iphonesimulator-arm64/install
           --package build/opencc/ios-iphonesimulator-arm64/opencc-ios-iphonesimulator-arm64.zip
 
-      - run: cd example && flutter pub get && flutter build ios --simulator --debug
+      - run: cd example && flutter pub get && flutter build ios --simulator --debug --target-platform ios-simulator-arm64
