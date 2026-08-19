@@ -1,0 +1,7 @@
+.dart_tool/
+.idea/
+pubspec.lock
+build/
+assets/opencc/
+tool/build-out/
+
