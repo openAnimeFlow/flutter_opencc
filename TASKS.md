@@ -92,14 +92,14 @@ opencc-linux-arm64.zip
 
 ## 4. Dart 包骨架
 
-- [ ] 确认 `pubspec.yaml` 依赖正确。
-- [ ] 添加 `analysis_options.yaml`。
-- [ ] 添加 `ffigen.yaml`。
-- [ ] 创建 `lib/`、`lib/src/`、`bin/`、`test/` 目录。
-- [ ] 添加示例工程目录 `example/`。
-- [ ] 配置 `assets/opencc/`。
-- [ ] 运行 `dart pub get`。
-- [ ] 运行 `dart analyze`，确保无问题。
+- [x] 确认 `pubspec.yaml` 依赖正确。
+- [x] 添加 `analysis_options.yaml`。
+- [x] 添加 `ffigen.yaml`。
+- [x] 创建 `lib/`、`lib/src/`、`bin/`、`test/` 目录。
+- [x] 添加示例工程目录 `example/`。
+- [x] 配置 `assets/opencc/`。
+- [x] 运行 `dart pub get`。
+- [x] 运行 `dart analyze`，确保无问题。
 
 依赖建议：
 
@@ -315,4 +315,3 @@ dev_dependencies:
 - [ ] 所有 Release 产物带版本号和校验和。
 - [ ] `dart analyze` 无错误。
 - [ ] `dart test` 全绿。
-

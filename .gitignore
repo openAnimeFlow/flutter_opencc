@@ -2,6 +2,6 @@
 .idea/
 pubspec.lock
 build/
-assets/opencc/
+assets/opencc/*
+!assets/opencc/.gitkeep
 tool/build-out/
-

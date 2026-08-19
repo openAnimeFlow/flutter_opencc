@@ -1,0 +1,9 @@
+name: FlutterOpenCCBindings
+description: FFI bindings generated from OpenCC 1.4.1 opencc.h.
+output: lib/src/lib_opencc.dart
+headers:
+  entry-points:
+    - third_party/opencc/src/opencc.h
+include-directives:
+  - third_party/opencc/src/opencc.h
+ffi-native:
