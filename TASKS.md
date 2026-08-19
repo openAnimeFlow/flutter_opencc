@@ -7,7 +7,7 @@
 
 - [ ] 确定项目根目录，建议为 `C:\Coding\ProJect\flutter_opencc`。
 - [ ] 确定包名 `flutter_opencc`、版本号和发布范围。
-- [ ] 固定 OpenCC 版本为 `ver.1.4.1`，不使用 `master`。
+- [x] 固定 OpenCC 版本为 `ver.1.4.1`，不使用 `master`。
 - [ ] 确定发布策略：维护者/CI 构建预编译共享库，最终包只下载二进制。
 - [ ] 确定词库资源策略：先采用方案 A 或方案 B，不依赖 `.dart_tool/share`。
 - [ ] 确定支持平台和 ABI。
@@ -23,8 +23,8 @@
 
 ## 1. OpenCC 源码与构建环境
 
-- [ ] 在维护构建目录 checkout OpenCC `ver.1.4.1`。
-- [ ] 确认源码包含 `deps/`，或准备好 FetchContent/子模块方式。
+- [x] 在维护构建目录 checkout OpenCC `ver.1.4.1`。
+- [x] 确认源码包含 `deps/`，或准备好 FetchContent/子模块方式。
 - [ ] 确认 CMake、Python、词库生成工具可用。
 - [ ] 在宿主机跑通一次 `libopencc` 构建。
 - [ ] 跑通 `Dictionaries` 目标，生成 `.ocd2` 和 JSON 配置。

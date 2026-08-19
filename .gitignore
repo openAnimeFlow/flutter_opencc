@@ -5,3 +5,4 @@ build/
 assets/opencc/*
 !assets/opencc/.gitkeep
 tool/build-out/
+third_party/opencc/
