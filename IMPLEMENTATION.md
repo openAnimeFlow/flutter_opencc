@@ -8,8 +8,8 @@ Dart API 在 Android、iOS、macOS、Windows、Linux 上转换简体中文和繁
 范围：
 
 - 支持 OpenCC `ver.1.4.1`，即当前最新稳定版。
-- 支持 `s2t`、`t2s`、`s2tw`、`tw2s`、`s2hk`、`hk2s`、`s2twp`、`tw2sp`、
-  `t2tw`、`tw2t`、`t2hk`、`hk2t`。
+- 支持 `s2t`、`t2s`、`s2tw`、`tw2s`、`s2hk`、`hk2s`、`s2hkp`、`hk2sp`、
+  `s2twp`、`tw2sp`、`t2tw`、`tw2t`、`t2hk`、`hk2t`、`t2jp`、`jp2t`。
 - 提供 `ZhConverter` 和 `ZhTransformer` 两个核心 API。
 - 提供 CLI，支持文本、文件、标准输入输出、原地替换。
 - 共享库通过 native assets 打进 Dart/Flutter 应用。

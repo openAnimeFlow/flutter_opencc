@@ -33,6 +33,8 @@ void main() {
         'tw2s',
         's2hk',
         'hk2s',
+        's2hkp',
+        'hk2sp',
         's2twp',
         'tw2sp',
         't2tw',
