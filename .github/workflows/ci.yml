@@ -55,10 +55,6 @@ jobs:
           channel: stable
 
       - name: Install CMake
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y cmake
-
-      - name: Install CMake
         if: runner.os == 'macOS'
         run: brew install cmake
 
@@ -98,7 +94,6 @@ jobs:
         with:
           channel: stable
 
-      - run: sudo apt-get update && sudo apt-get install -y cmake
       - run: flutter pub get
 
       - name: Build Android OpenCC
