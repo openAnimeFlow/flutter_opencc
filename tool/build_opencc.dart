@@ -191,7 +191,9 @@ Map<String, String> _parseOptions(List<String> args) {
 }
 
 bool _isCrossTarget(String target) {
-  return target.startsWith('android') || target.startsWith('ios');
+  return target.startsWith('android') ||
+      target.startsWith('ios') ||
+      target == 'windows-arm64';
 }
 
 List<String> _buildTargets(bool crossTarget) {
@@ -233,6 +235,7 @@ Future<String> _buildHostDictionaries(
     'Release',
     '--target',
     'Dictionaries',
+    'opencc_phrase_extract',
     '--parallel',
   ]);
   await _run(cmake, ['--install', hostBuild, '--prefix', hostInstall]);
@@ -251,7 +254,8 @@ void _installCrossTarget(
 ) {
   final libraryName = _libraryFileName(target);
   final librarySource = _findBuiltLibrary(build, libraryName);
-  final installLib = Directory(p.join(install, 'lib'))
+  final libraryDirectory = target.startsWith('windows') ? 'bin' : 'lib';
+  final installLib = Directory(p.join(install, libraryDirectory))
     ..createSync(recursive: true);
   File(p.join(installLib.path, libraryName)).writeAsBytesSync(
     librarySource.readAsBytesSync(),
@@ -275,6 +279,7 @@ void _installCrossTarget(
 File _findBuiltLibrary(String build, String libraryName) {
   final candidates = [
     p.join(build, 'src', libraryName),
+    p.join(build, 'src', 'Release', libraryName),
     p.join(build, libraryName),
   ];
   for (final candidate in candidates) {
