@@ -98,6 +98,14 @@ List<String> _configureArgs(
         '-DCMAKE_OSX_ARCHITECTURES=arm64',
         '-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0',
       ];
+    case 'ios-iphonesimulator-x64':
+      return [
+        ...common,
+        '-DCMAKE_SYSTEM_NAME=iOS',
+        '-DCMAKE_OSX_SYSROOT=iphonesimulator',
+        '-DCMAKE_OSX_ARCHITECTURES=x86_64',
+        '-DCMAKE_OSX_DEPLOYMENT_TARGET=13.0',
+      ];
     case 'android-arm64':
       return [...common, ..._androidArgs('arm64-v8a')];
     case 'android-arm':
