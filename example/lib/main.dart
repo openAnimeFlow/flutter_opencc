@@ -12,11 +12,7 @@ class OpenCCExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'flutter_opencc example',
-      home: Scaffold(
-        body: Center(
-          child: Text('$packageName example app'),
-        ),
-      ),
+      home: Scaffold(body: Center(child: Text('$packageName example app'))),
     );
   }
 }

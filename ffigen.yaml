@@ -4,6 +4,5 @@ output: lib/src/lib_opencc.dart
 headers:
   entry-points:
     - third_party/opencc/src/opencc.h
-include-directives:
-  - third_party/opencc/src/opencc.h
-ffi-native:
+  include-directives:
+    - third_party/opencc/src/opencc.h

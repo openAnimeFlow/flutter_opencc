@@ -25,10 +25,10 @@
 
 - [x] 在维护构建目录 checkout OpenCC `ver.1.4.1`。
 - [x] 确认源码包含 `deps/`，或准备好 FetchContent/子模块方式。
-- [ ] 确认 CMake、Python、词库生成工具可用。
-- [ ] 在宿主机跑通一次 `libopencc` 构建。
-- [ ] 跑通 `Dictionaries` 目标，生成 `.ocd2` 和 JSON 配置。
-- [ ] 用简单文本验证 `s2t`、`t2s` 转换结果。
+- [x] 确认 CMake、Python、词库生成工具可用。
+- [x] 在宿主机跑通一次 `libopencc` 构建。
+- [x] 跑通 `Dictionaries` 目标，生成 `.ocd2` 和 JSON 配置。
+- [x] 用简单文本验证 `s2t`、`t2s` 转换结果。
 
 完成标准：
 
@@ -124,13 +124,13 @@ dev_dependencies:
 
 ## 5. FFI 绑定
 
-- [ ] 准备 OpenCC 1.4.1 的 `src/opencc.h`。
-- [ ] 配置 `ffigen.yaml` 的 header 路径。
-- [ ] 生成 `lib/src/lib_opencc.dart`。
-- [ ] 检查 `opencc_open`、`opencc_close`、`opencc_convert_utf8_to_buffer`。
-- [ ] 检查 `opencc_convert_utf8`、`opencc_convert_utf8_free`、`opencc_error`。
+- [x] 准备 OpenCC 1.4.1 的 `src/opencc.h`。
+- [x] 配置 `ffigen.yaml` 的 header 路径。
+- [x] 生成 `lib/src/lib_opencc.dart`。
+- [x] 检查 `opencc_open`、`opencc_close`、`opencc_convert_utf8_to_buffer`。
+- [x] 检查 `opencc_convert_utf8`、`opencc_convert_utf8_free`、`opencc_error`。
 - [ ] 确认绑定文件名与 build hook 中 code asset 的 `name` 一致。
-- [ ] 运行 `dart analyze`。
+- [x] 运行 `dart analyze`。
 
 完成标准：
 
@@ -139,12 +139,12 @@ dev_dependencies:
 
 ## 6. CharArray 与内存管理
 
-- [ ] 实现 Dart String 到 C UTF-8 缓冲区的转换。
-- [ ] 实现 C 缓冲区到 Dart String 的转换。
-- [ ] 支持自动扩容。
-- [ ] 支持安全释放。
-- [ ] 保证释放后不可再用。
-- [ ] 为 `dispose()` 增加幂等保护。
+- [x] 实现 Dart String 到 C UTF-8 缓冲区的转换。
+- [x] 实现 C 缓冲区到 Dart String 的转换。
+- [x] 支持自动扩容。
+- [x] 支持安全释放。
+- [x] 保证释放后不可再用。
+- [x] 为 `dispose()` 增加幂等保护。
 
 完成标准：
 
@@ -174,13 +174,13 @@ dev_dependencies:
 ## 8. 词库资源加载
 
 - [ ] 把 OpenCC 资源和配置放入 `assets/opencc/`。
-- [ ] 在 `pubspec.yaml` 中声明资源。
+- [x] 在 `pubspec.yaml` 中声明资源。
 - [ ] 实现运行时资源目录解析。
 - [ ] Android 支持从 Flutter assets 复制到可写目录。
 - [ ] iOS/macOS 支持 app bundle 资源绝对路径。
-- [ ] Windows/Linux 支持可执行文件旁目录或用户传入目录。
-- [ ] 支持 `ZhConverter(config, dataDir: ...)`。
-- [ ] 确保不依赖环境变量。
+- [x] Windows/Linux 支持可执行文件旁目录或用户传入目录。
+- [x] 支持 `ZhConverter(config, dataDir: ...)`。
+- [x] 确保不依赖环境变量。
 
 可选：
 
@@ -194,13 +194,13 @@ dev_dependencies:
 
 ## 9. Dart API
 
-- [ ] 实现 `ZhConverter`。
-- [ ] 实现 `ZhTransformer`。
-- [ ] 支持全部 OpenCC 配置名。
-- [ ] 支持自定义 `dataDir`。
-- [ ] 转换失败抛出明确错误。
-- [ ] 保证 `dispose()` 幂等。
-- [ ] 记录并发使用限制。
+- [x] 实现 `ZhConverter`。
+- [x] 实现 `ZhTransformer`。
+- [x] 支持全部 OpenCC 配置名。
+- [x] 支持自定义 `dataDir`。
+- [x] 转换失败抛出明确错误。
+- [x] 保证 `dispose()` 幂等。
+- [x] 记录并发使用限制。
 
 完成标准：
 
@@ -210,14 +210,14 @@ dev_dependencies:
 
 ## 10. CLI
 
-- [ ] 支持 `-c s2t` 等配置参数。
-- [ ] 支持 `--data-dir`。
-- [ ] 支持文本参数。
-- [ ] 支持文件参数。
-- [ ] 支持标准输入输出。
-- [ ] 支持 `-i` 原地替换。
-- [ ] 支持 `-h` 帮助。
-- [ ] 完善错误提示和退出码。
+- [x] 支持 `-c s2t` 等配置参数。
+- [x] 支持 `--data-dir`。
+- [x] 支持文本参数。
+- [x] 支持文件参数。
+- [x] 支持标准输入输出。
+- [x] 支持 `-i` 原地替换。
+- [x] 支持 `-h` 帮助。
+- [x] 完善错误提示和退出码。
 
 完成标准：
 
