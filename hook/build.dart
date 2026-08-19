@@ -9,7 +9,7 @@ import 'package:zip2/zip2.dart';
 const _assetName = 'src/lib_opencc.dart';
 // Override with userDefines `base_url` until the first release exists.
 const _defaultBaseUrl =
-    'https://github.com/your-org/flutter_opencc/releases/latest/download';
+    'https://github.com/openAnimeFlow/flutter_opencc/releases/latest/download';
 
 void main(List<String> args) async {
   await build(args, (input, output) async {

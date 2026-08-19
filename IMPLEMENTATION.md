@@ -283,7 +283,7 @@ import 'package:zip2/zip2.dart';
 
 const _libName = 'opencc';
 const _baseUrl =
-    'https://github.com/<owner>/flutter_opencc/releases/latest/download';
+    'https://github.com/openAnimeFlow/flutter_opencc/releases/latest/download';
 
 void main(List<String> args) async {
   await build(args, (input, output) async {
