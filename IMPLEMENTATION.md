@@ -65,6 +65,7 @@ flutter_opencc/
 │       ├── STPhrases.ocd2
 │       └── ...
 ├── bin/
+│   ├── flutter_opencc.dart
 │   └── opencc.dart
 ├── example/
 │   └── flutter_opencc_example/

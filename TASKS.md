@@ -265,14 +265,14 @@ dev_dependencies:
 
 ## 13. 文档
 
-- [ ] 编写 README。
-- [ ] 编写 API 使用示例。
-- [ ] 编写 CLI 使用示例。
-- [ ] 编写平台支持表。
-- [ ] 编写 OpenCC 版本和 ABI 说明。
-- [ ] 编写发布产物说明。
-- [ ] 编写贡献指南。
-- [ ] 补充 LICENSE 和 NOTICE。
+- [x] 编写 README。
+- [x] 编写 API 使用示例。
+- [x] 编写 CLI 使用示例。
+- [x] 编写平台支持表。
+- [x] 编写 OpenCC 版本和 ABI 说明。
+- [x] 编写发布产物说明。
+- [x] 编写贡献指南。
+- [x] 补充 LICENSE 和 NOTICE。
 
 完成标准：
 
