@@ -8,12 +8,12 @@ environment:
   flutter: '>=3.44.0'
 
 dependencies:
+  archive: ^4.1.0
   code_assets: ^2.0.0
   crypto: ^3.0.7
   ffi: ^2.2.0
   hooks: ^2.2.0
   path: ^1.9.0
-  zip2: ^1.0.1
 
 dev_dependencies:
   ffigen: ^20.1.1

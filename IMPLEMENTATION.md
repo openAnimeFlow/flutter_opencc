@@ -104,11 +104,11 @@ environment:
   sdk: '>=3.10.0 <4.0.0'
 
 dependencies:
+  archive: ^4.1.0
   code_assets: ^2.0.0
   ffi: ^2.2.0
   hooks: ^2.2.0
   path: ^1.9.0
-  zip2: ^1.0.1
 
 dev_dependencies:
   ffigen: ^20.1.1
@@ -123,7 +123,7 @@ flutter:
 说明：
 
 - `code_assets` 和 `hooks` 是 build hook 依赖。
-- `zip2` 用于解压预编译产物。
+- `archive` 用于解压预编译产物。
 - 资源放在 `assets/opencc/`，由 Flutter package assets 自动打包。
 - 消费方访问路径是 `packages/flutter_opencc/assets/opencc/s2t.json`。
 
@@ -277,9 +277,9 @@ opencc-ios-iphonesimulator-arm64.zip
 ```dart
 import 'dart:io';
 
+import 'package:archive/archive.dart';
 import 'package:code_assets/code_assets.dart';
 import 'package:hooks/hooks.dart';
-import 'package:zip2/zip2.dart';
 
 const _libName = 'opencc';
 const _baseUrl =
@@ -304,15 +304,19 @@ void main(List<String> args) async {
       await _download(Uri.parse('$_baseUrl/$archiveName'), archiveFile);
     }
 
-    final zip = archiveFile.openSync().unzip();
+    final archiveInput = InputFileStream(archiveFile.path);
+    final zip = ZipDecoder().decodeStream(archiveInput);
     final libName = os.dylibFileName(_libName);
-    final libEntry = zip[libName];
-    if (libEntry == null) {
+    final libEntry = zip.find(libName);
+    if (libEntry == null || !libEntry.isFile) {
       throw StateError('$archiveName does not contain $libName');
     }
 
     final libFile = File.fromUri(input.outputDirectory.resolve(libName));
-    await libEntry.data.pipe(libFile.openWrite());
+    final output = OutputFileStream(libFile.path);
+    libEntry.writeContent(output);
+    output.closeSync();
+    archiveInput.closeSync();
 
     output.assets.code.add(
       CodeAsset(

@@ -105,11 +105,11 @@ opencc-linux-arm64.zip
 
 ```yaml
 dependencies:
+  archive: ^4.1.0
   code_assets: ^2.0.0
-  ffi: ^2.1.3
-  hooks: ^2.0.0
+  ffi: ^2.2.0
+  hooks: ^2.2.0
   path: ^1.9.0
-  zip2: ^1.0.1
 
 dev_dependencies:
   ffigen: ^20.1.1

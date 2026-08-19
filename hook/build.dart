@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:archive/archive.dart';
 import 'package:code_assets/code_assets.dart';
 import 'package:crypto/crypto.dart' show sha256;
 import 'package:hooks/hooks.dart';
-import 'package:zip2/zip2.dart';
 
 const _assetName = 'src/lib_opencc.dart';
 // Override with userDefines `base_url` until the first release exists.
@@ -56,18 +56,23 @@ void main(List<String> args) async {
       );
       output.dependencies.add(archiveFile.uri);
 
-      final archiveHandle = archiveFile.openSync();
+      final archiveInput = InputFileStream(archiveFile.path);
       try {
-        final archive = archiveHandle.unzip();
-        final entry = archive[libraryName];
-        if (entry == null) {
+        final archive = ZipDecoder().decodeStream(archiveInput);
+        final entry = archive.find(libraryName);
+        if (entry == null || !entry.isFile) {
           throw StateError('$archiveName does not contain $libraryName');
         }
         if (!libraryFile.existsSync()) {
-          await entry.data.pipe(libraryFile.openWrite());
+          final output = OutputFileStream(libraryFile.path);
+          try {
+            entry.writeContent(output);
+          } finally {
+            output.closeSync();
+          }
         }
       } finally {
-        archiveHandle.closeSync();
+        archiveInput.closeSync();
       }
     }
 

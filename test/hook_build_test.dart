@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:archive/archive.dart';
 import 'package:code_assets/code_assets.dart';
 import 'package:crypto/crypto.dart' show sha256;
 import 'package:hooks/hooks.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
-import 'package:zip2/zip2.dart';
 
 import '../hook/build.dart' as hook;
 
@@ -52,16 +52,11 @@ void main() {
 
     const archiveName = 'opencc-windows-x64.zip';
     final archiveFile = File(p.join(tempDir.path, archiveName));
-    final archive = ZipArchive([
-      ZipFileEntry(
-        name: 'opencc.dll',
-        data: Stream.value(sourceDll.readAsBytesSync()),
-        method: ZipMethod.stored,
-      ),
-    ]);
-    await archive.zip().pipe(archiveFile.openWrite());
+    final archive = Archive()
+      ..add(ArchiveFile.bytes('opencc.dll', sourceDll.readAsBytesSync()));
+    await archiveFile.writeAsBytes(ZipEncoder().encode(archive));
 
-      final hash = sha256.convert(await archiveFile.readAsBytes()).toString();
+    final hash = sha256.convert(await archiveFile.readAsBytes()).toString();
     await File(
       p.join(tempDir.path, '$archiveName.sha256'),
     ).writeAsString('$hash  $archiveName\n');
