@@ -11,13 +11,11 @@ import 'lib_opencc.dart' as bindings;
 ///
 /// One instance is not safe to share across isolates; create one per isolate.
 final class ZhConverter {
-  ZhConverter(String config, {required String dataDir, String? libraryPath})
+  ZhConverter(String config, {required String dataDir})
     : _configPath = _resolveConfigPath(config, dataDir) {
-    _bindings = loadOpenCCBindings(libraryPath: libraryPath);
-    _handle = _openConverter(_bindings, _configPath);
+    _handle = _openConverter(_configPath);
   }
 
-  late final bindings.FlutterOpenCCBindings _bindings;
   final String _configPath;
   late final bindings.opencc_t _handle;
   bool _disposed = false;
@@ -26,7 +24,7 @@ final class ZhConverter {
     _ensureOpen();
     final input = CharArray.fromString(text);
     try {
-      final output = _bindings.opencc_convert_utf8(
+      final output = bindings.opencc_convert_utf8(
         _handle,
         input.pointer,
         input.length,
@@ -37,7 +35,7 @@ final class ZhConverter {
       try {
         return output.cast<Utf8>().toDartString();
       } finally {
-        _bindings.opencc_convert_utf8_free(output);
+        bindings.opencc_convert_utf8_free(output);
       }
     } finally {
       input.dispose();
@@ -49,7 +47,7 @@ final class ZhConverter {
       return;
     }
     _disposed = true;
-    _bindings.opencc_close(_handle);
+    bindings.opencc_close(_handle);
   }
 
   void _ensureOpen() {
@@ -59,7 +57,7 @@ final class ZhConverter {
   }
 
   String _lastError() {
-    final error = _bindings.opencc_error();
+    final error = bindings.opencc_error();
     if (error.address == 0) {
       return 'unknown error';
     }
@@ -78,12 +76,8 @@ final class ZhConverter {
 
 /// A stream transformer that converts text in chunks.
 final class ZhTransformer extends StreamTransformerBase<String, String> {
-  ZhTransformer(String config, {required String dataDir, String? libraryPath})
-    : _converter = ZhConverter(
-        config,
-        dataDir: dataDir,
-        libraryPath: libraryPath,
-      );
+  ZhTransformer(String config, {required String dataDir})
+    : _converter = ZhConverter(config, dataDir: dataDir);
 
   final ZhConverter _converter;
 
@@ -111,30 +105,24 @@ final class ZhTransformer extends StreamTransformerBase<String, String> {
   void dispose() => _converter.dispose();
 }
 
-bindings.opencc_t _openConverter(
-  bindings.FlutterOpenCCBindings bindings,
-  String configPath,
-) {
+bindings.opencc_t _openConverter(String configPath) {
   if (Platform.isWindows) {
     final wide = toWideString(configPath);
     try {
-      return _checkHandle(bindings, bindings.opencc_open_w(wide));
+      return _checkHandle(bindings.opencc_open_w(wide));
     } finally {
       freeWideString(wide);
     }
   }
   final path = CharArray.fromString(configPath);
   try {
-    return _checkHandle(bindings, bindings.opencc_open(path.pointer));
+    return _checkHandle(bindings.opencc_open(path.pointer));
   } finally {
     path.dispose();
   }
 }
 
-bindings.opencc_t _checkHandle(
-  bindings.FlutterOpenCCBindings bindings,
-  bindings.opencc_t handle,
-) {
+bindings.opencc_t _checkHandle(bindings.opencc_t handle) {
   if (handle.address == 0xFFFFFFFFFFFFFFFF) {
     final error = bindings.opencc_error();
     final message = error.address == 0

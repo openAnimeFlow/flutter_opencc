@@ -9,7 +9,6 @@ Usage: dart run flutter_opencc [options] [<text|file>...]
 Options:
   -c, --config <name>   OpenCC config name (default: s2t)
       --data-dir <dir>  Directory containing config JSON and .ocd2 files
-      --library <path>  Path to the OpenCC shared library
   -i, --in-place        Rewrite input files in place
   -h, --help            Show this help
 
@@ -24,7 +23,6 @@ Future<void> main(List<String> args) async {
 
   var config = 's2t';
   String? dataDir;
-  String? libraryPath;
   var inPlace = false;
   final inputs = <String>[];
 
@@ -35,14 +33,10 @@ Future<void> main(List<String> args) async {
         config = _nextValue(args, ++i, arg);
       } else if (arg == '--data-dir') {
         dataDir = _nextValue(args, ++i, arg);
-      } else if (arg == '--library') {
-        libraryPath = _nextValue(args, ++i, arg);
       } else if (arg == '-i' || arg == '--in-place') {
         inPlace = true;
       } else if (arg.startsWith('--data-dir=')) {
         dataDir = arg.substring('--data-dir='.length);
-      } else if (arg.startsWith('--library=')) {
-        libraryPath = arg.substring('--library='.length);
       } else {
         inputs.add(arg);
       }
@@ -59,11 +53,7 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final converter = ZhConverter(
-    config,
-    dataDir: dataDir,
-    libraryPath: libraryPath,
-  );
+  final converter = ZhConverter(config, dataDir: dataDir);
   try {
     if (inputs.isEmpty) {
       final text = await utf8.decoder.bind(stdin).join();

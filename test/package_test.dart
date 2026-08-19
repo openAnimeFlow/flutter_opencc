@@ -9,14 +9,6 @@ void main() {
     expect(packageName, 'flutter_opencc');
   });
 
-  final libraryPath = p.join(
-    'build',
-    'opencc',
-    'windows-x64',
-    'install',
-    'bin',
-    'opencc.dll',
-  );
   final dataDir = p.join(
     'build',
     'opencc',
@@ -26,39 +18,25 @@ void main() {
     'opencc',
   );
   final localBuildAvailable =
-      Platform.isWindows &&
-      File(libraryPath).existsSync() &&
-      Directory(dataDir).existsSync();
+      Platform.isWindows && Directory(dataDir).existsSync();
 
   group('ZhConverter', () {
     test('converts simplified Chinese to traditional Chinese', () {
-      final converter = ZhConverter(
-        's2t',
-        dataDir: dataDir,
-        libraryPath: libraryPath,
-      );
+      final converter = ZhConverter('s2t', dataDir: dataDir);
       addTearDown(converter.dispose);
 
       expect(converter.convert('开放中文转换 OpenCC'), '開放中文轉換 OpenCC');
     }, skip: localBuildAvailable ? false : 'local OpenCC build not found');
 
     test('converts traditional Chinese to simplified Chinese', () {
-      final converter = ZhConverter(
-        't2s',
-        dataDir: dataDir,
-        libraryPath: libraryPath,
-      );
+      final converter = ZhConverter('t2s', dataDir: dataDir);
       addTearDown(converter.dispose);
 
       expect(converter.convert('鼠標與軟件 OpenCC'), '鼠标与软件 OpenCC');
     }, skip: localBuildAvailable ? false : 'local OpenCC build not found');
 
     test('handles empty strings and repeated dispose', () {
-      final converter = ZhConverter(
-        's2t',
-        dataDir: dataDir,
-        libraryPath: libraryPath,
-      );
+      final converter = ZhConverter('s2t', dataDir: dataDir);
 
       expect(converter.convert(''), '');
       converter.dispose();
@@ -66,11 +44,7 @@ void main() {
     }, skip: localBuildAvailable ? false : 'local OpenCC build not found');
 
     test('transforms a stream line by line', () async {
-      final transformer = ZhTransformer(
-        's2t',
-        dataDir: dataDir,
-        libraryPath: libraryPath,
-      );
+      final transformer = ZhTransformer('s2t', dataDir: dataDir);
       addTearDown(transformer.dispose);
 
       final lines = Stream<String>.fromIterable([

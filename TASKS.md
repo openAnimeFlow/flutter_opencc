@@ -129,7 +129,7 @@ dev_dependencies:
 - [x] 生成 `lib/src/lib_opencc.dart`。
 - [x] 检查 `opencc_open`、`opencc_close`、`opencc_convert_utf8_to_buffer`。
 - [x] 检查 `opencc_convert_utf8`、`opencc_convert_utf8_free`、`opencc_error`。
-- [ ] 确认绑定文件名与 build hook 中 code asset 的 `name` 一致。
+- [x] 确认绑定文件名与 build hook 中 code asset 的 `name` 一致。
 - [x] 运行 `dart analyze`。
 
 完成标准：
@@ -153,16 +153,16 @@ dev_dependencies:
 
 ## 7. Build Hook
 
-- [ ] 创建 `hook/build.dart`。
-- [ ] 根据 `targetOS` 和 `targetArchitecture` 选择下载 URL。
-- [ ] 根据 iOS SDK 增加 `iphoneos` 或 `iphonesimulator` 后缀。
-- [ ] 实现 zip 下载和解压。
-- [ ] 实现 SHA-256 校验。
-- [ ] 提取动态库到 hook 输出目录。
-- [ ] 注册 `CodeAsset` 和 `DynamicLoadingBundled`。
-- [ ] 声明 hook 依赖，保证缓存正确。
-- [ ] 支持代理和镜像 URL。
-- [ ] 支持通过 `userDefines` 指定本地预编译目录。
+- [x] 创建 `hook/build.dart`。
+- [x] 根据 `targetOS` 和 `targetArchitecture` 选择下载 URL。
+- [x] 根据 iOS SDK 增加 `iphoneos` 或 `iphonesimulator` 后缀。
+- [x] 实现 zip 下载和解压。
+- [x] 实现 SHA-256 校验。
+- [x] 提取动态库到 hook 输出目录。
+- [x] 注册 `CodeAsset` 和 `DynamicLoadingBundled`。
+- [x] 声明 hook 依赖，保证缓存正确。
+- [x] 支持代理和镜像 URL。
+- [x] 支持通过 `userDefines` 指定本地预编译目录。
 - [ ] 在 Windows/Linux/macOS 上跑通 `dart test`。
 - [ ] 在 Android/iOS 上跑通 `flutter build`。
 

@@ -1,37 +1,8 @@
 import 'dart:convert';
 import 'dart:ffi' as ffi;
-import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:ffi/ffi.dart';
-
-import 'lib_opencc.dart' as bindings;
-
-/// Loads the OpenCC shared library for the current platform.
-ffi.DynamicLibrary loadOpenCCLibrary({String? libraryPath}) {
-  if (libraryPath != null && libraryPath.isNotEmpty) {
-    return ffi.DynamicLibrary.open(libraryPath);
-  }
-  if (Platform.isWindows) {
-    return ffi.DynamicLibrary.open('opencc.dll');
-  }
-  if (Platform.isLinux) {
-    return ffi.DynamicLibrary.open('libopencc.so');
-  }
-  if (Platform.isMacOS) {
-    return ffi.DynamicLibrary.open('libopencc.dylib');
-  }
-  throw UnsupportedError(
-    'OpenCC is not supported on ${Platform.operatingSystem}.',
-  );
-}
-
-/// Loads the generated OpenCC bindings.
-bindings.FlutterOpenCCBindings loadOpenCCBindings({String? libraryPath}) {
-  return bindings.FlutterOpenCCBindings(
-    loadOpenCCLibrary(libraryPath: libraryPath),
-  );
-}
 
 /// A managed UTF-8 buffer passed to the OpenCC C API.
 final class CharArray {

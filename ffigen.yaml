@@ -6,3 +6,5 @@ headers:
     - third_party/opencc/src/opencc.h
   include-directives:
     - third_party/opencc/src/opencc.h
+ffi-native:
+  asset-id: 'package:flutter_opencc/src/lib_opencc.dart'
