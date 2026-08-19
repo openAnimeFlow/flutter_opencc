@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_opencc/flutter_opencc.dart';
 
-const _defaultDataDir = String.fromEnvironment('FLUTTER_OPENCC_DATA_DIR');
-
 void main() {
   runApp(const OpenCCExampleApp());
 }
 
 class OpenCCExampleApp extends StatefulWidget {
-  const OpenCCExampleApp({super.key, this.dataDir = _defaultDataDir});
-
-  final String dataDir;
+  const OpenCCExampleApp({super.key});
 
   @override
   State<OpenCCExampleApp> createState() => _OpenCCExampleAppState();
@@ -27,17 +23,9 @@ class _OpenCCExampleAppState extends State<OpenCCExampleApp> {
     super.dispose();
   }
 
-  void _convert() {
+  Future<void> _convert() async {
     final text = _controller.text;
-    if (widget.dataDir.isEmpty) {
-      setState(() {
-        _error = 'Set FLUTTER_OPENCC_DATA_DIR to the OpenCC data directory.';
-        _output = '';
-      });
-      return;
-    }
-
-    final converter = ZhConverter('s2t', dataDir: widget.dataDir);
+    final converter = await ZhConverter.create('s2t');
     try {
       final output = converter.convert(text);
       setState(() {

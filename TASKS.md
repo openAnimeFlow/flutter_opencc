@@ -8,9 +8,9 @@
 - [ ] 确定项目根目录，建议为 `C:\Coding\ProJect\flutter_opencc`。
 - [ ] 确定包名 `flutter_opencc`、版本号和发布范围。
 - [x] 固定 OpenCC 版本为 `ver.1.4.1`，不使用 `master`。
-- [ ] 确定发布策略：维护者/CI 构建预编译共享库，最终包只下载二进制。
-- [ ] 确定词库资源策略：先采用方案 A 或方案 B，不依赖 `.dart_tool/share`。
-- [ ] 确定支持平台和 ABI。
+- [x] 确定发布策略：维护者/CI 构建预编译共享库，最终包只下载二进制。
+- [x] 确定词库资源策略：方案 A，Flutter package assets 打包词库。
+- [x] 确定支持平台和 ABI。
 - [ ] 初始化 Git 仓库。
 - [ ] 创建 `README.md`、`pubspec.yaml`、`.gitignore`。
 - [ ] 确认 Dart SDK 和 Flutter 版本满足要求。
@@ -163,8 +163,8 @@ dev_dependencies:
 - [x] 声明 hook 依赖，保证缓存正确。
 - [x] 支持代理和镜像 URL。
 - [x] 支持通过 `userDefines` 指定本地预编译目录。
-- [ ] 在 Windows/Linux/macOS 上跑通 `dart test`。
-- [ ] 在 Android/iOS 上跑通 `flutter build`。
+- [x] 在 Windows/Linux/macOS 上跑通 `dart test`。
+- [x] 在 Android/iOS 上跑通 `flutter build`。
 
 完成标准：
 
@@ -173,11 +173,11 @@ dev_dependencies:
 
 ## 8. 词库资源加载
 
-- [ ] 把 OpenCC 资源和配置放入 `assets/opencc/`。
+- [x] 把 OpenCC 资源和配置放入 `assets/opencc/`。
 - [x] 在 `pubspec.yaml` 中声明资源。
-- [ ] 实现运行时资源目录解析。
-- [ ] Android 支持从 Flutter assets 复制到可写目录。
-- [ ] iOS/macOS 支持 app bundle 资源绝对路径。
+- [x] 实现运行时资源目录解析。
+- [x] Android 支持从 Flutter assets 复制到可写目录。
+- [x] iOS/macOS 支持 app bundle 资源绝对路径。
 - [x] Windows/Linux 支持可执行文件旁目录或用户传入目录。
 - [x] 支持 `ZhConverter(config, dataDir: ...)`。
 - [x] 确保不依赖环境变量。

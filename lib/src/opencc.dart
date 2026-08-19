@@ -6,14 +6,25 @@ import 'package:path/path.dart' as p;
 
 import 'ffi.dart';
 import 'lib_opencc.dart' as bindings;
+import 'resources.dart';
 
 /// Converts text between Chinese variants using OpenCC.
 ///
 /// One instance is not safe to share across isolates; create one per isolate.
 final class ZhConverter {
-  ZhConverter(String config, {required String dataDir})
-    : _configPath = _resolveConfigPath(config, dataDir) {
+  ZhConverter(String config, {String? dataDir})
+    : _configPath = _resolveConfigPath(
+        config,
+        dataDir ?? _resolveSyncDataDir(),
+      ) {
     _handle = _openConverter(_configPath);
+  }
+
+  /// Resolves OpenCC resources, including Flutter assets, then opens a
+  /// converter. Prefer this when no [dataDir] is supplied.
+  static Future<ZhConverter> create(String config, {String? dataDir}) async {
+    final resolved = await resolveOpenCCDataDir(dataDir: dataDir);
+    return ZhConverter(config, dataDir: resolved);
   }
 
   final String _configPath;
@@ -76,8 +87,17 @@ final class ZhConverter {
 
 /// A stream transformer that converts text in chunks.
 final class ZhTransformer extends StreamTransformerBase<String, String> {
-  ZhTransformer(String config, {required String dataDir})
+  ZhTransformer(String config, {String? dataDir})
     : _converter = ZhConverter(config, dataDir: dataDir);
+
+  /// Resolves OpenCC resources, including Flutter assets, then creates a
+  /// transformer.
+  static Future<ZhTransformer> create(String config, {String? dataDir}) async {
+    final converter = await ZhConverter.create(config, dataDir: dataDir);
+    return ZhTransformer._fromConverter(converter);
+  }
+
+  ZhTransformer._fromConverter(this._converter);
 
   final ZhConverter _converter;
 
@@ -103,6 +123,17 @@ final class ZhTransformer extends StreamTransformerBase<String, String> {
   }
 
   void dispose() => _converter.dispose();
+}
+
+String _resolveSyncDataDir() {
+  final resolved = resolveOpenCCDataDirSync();
+  if (resolved == null) {
+    throw StateError(
+      'OpenCC resources not found in the filesystem. Pass dataDir or use '
+      'await ZhConverter.create() inside a Flutter app.',
+    );
+  }
+  return resolved;
 }
 
 bindings.opencc_t _openConverter(String configPath) {
