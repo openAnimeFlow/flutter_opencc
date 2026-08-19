@@ -13,22 +13,26 @@ Future<void> main(List<String> args) async {
   final package = options['--package']!;
   final cmake = options['--cmake'] ?? 'cmake';
   final generator = options['--generator'];
+  var resources = options['--resources'];
+  final crossTarget = _isCrossTarget(target);
+  if (crossTarget && resources == null) {
+    resources = await _buildHostDictionaries(source, build, cmake);
+  }
 
-  await _run(cmake, _configureArgs(target, source, build, generator));
+  await _run(cmake, _configureArgs(target, source, build, generator, crossTarget));
   await _run(cmake, [
     '--build',
     build,
     '--config',
     'Release',
-    '--target',
-    'libopencc',
-    'Dictionaries',
-    'opencc',
-    'opencc_dict',
-    'opencc_phrase_extract',
+    ..._buildTargets(crossTarget),
     '--parallel',
   ]);
-  await _run(cmake, ['--install', build, '--prefix', install]);
+  if (crossTarget) {
+    _installCrossTarget(target, install, build, resources!);
+  } else {
+    await _run(cmake, ['--install', build, '--prefix', install]);
+  }
 
   final archive = _createPackage(target, install);
   final bytes = ZipEncoder().encode(archive);
@@ -45,6 +49,7 @@ List<String> _configureArgs(
   String source,
   String build,
   String? generator,
+  bool crossTarget,
 ) {
   final common = <String>[
     '-S',
@@ -54,26 +59,14 @@ List<String> _configureArgs(
     '-DCMAKE_BUILD_TYPE=Release',
     '-DBUILD_SHARED_LIBS=ON',
     '-DBUILD_OPENCC_JIEBA_PLUGIN=OFF',
-    '-DOPENCC_ENABLE_INSTALL=ON',
+    '-DOPENCC_ENABLE_INSTALL=${crossTarget ? 'OFF' : 'ON'}',
     '-DOPENCC_DICT_FORMAT=ocd2',
   ];
   switch (target) {
     case 'windows-x64':
-      return [
-        ...common,
-        '-G',
-        generator ?? 'Visual Studio 17 2022',
-        '-A',
-        'x64',
-      ];
+      return _windowsArgs(common, generator, 'x64');
     case 'windows-arm64':
-      return [
-        ...common,
-        '-G',
-        generator ?? 'Visual Studio 17 2022',
-        '-A',
-        'arm64',
-      ];
+      return _windowsArgs(common, generator, 'arm64');
     case 'linux-x64':
     case 'linux-arm64':
       return common;
@@ -116,6 +109,18 @@ List<String> _configureArgs(
     default:
       throw ArgumentError('Unknown target: $target');
   }
+}
+
+List<String> _windowsArgs(
+  List<String> common,
+  String? generator,
+  String architecture,
+) {
+  final result = [...common];
+  if (generator != null) {
+    result.addAll(['-G', generator]);
+  }
+  return [...result, '-A', architecture];
 }
 
 List<String> _androidArgs(String abi) {
@@ -179,10 +184,104 @@ Map<String, String> _parseOptions(List<String> args) {
       'Usage: dart tool/build_opencc.dart '
       '--target <name> --source <dir> --build <dir> '
       '--install <dir> --package <zip> [--cmake <cmake>] '
-      '[--generator <generator>]',
+      '[--generator <generator>] [--resources <dir>]',
     );
   }
   return {for (var i = 0; i < args.length; i += 2) args[i]: args[i + 1]};
+}
+
+bool _isCrossTarget(String target) {
+  return target.startsWith('android') || target.startsWith('ios');
+}
+
+List<String> _buildTargets(bool crossTarget) {
+  if (crossTarget) {
+    return ['--target', 'libopencc'];
+  }
+  return [
+    '--target',
+    'libopencc',
+    'Dictionaries',
+    'opencc',
+    'opencc_dict',
+    'opencc_phrase_extract',
+  ];
+}
+
+Future<String> _buildHostDictionaries(
+  String source,
+  String build,
+  String cmake,
+) async {
+  final hostBuild = p.normalize(p.join(build, '..', 'host-dictionaries'));
+  final hostInstall = p.join(hostBuild, 'install');
+  await _run(cmake, [
+    '-S',
+    source,
+    '-B',
+    hostBuild,
+    '-DCMAKE_BUILD_TYPE=Release',
+    '-DBUILD_SHARED_LIBS=OFF',
+    '-DBUILD_OPENCC_JIEBA_PLUGIN=OFF',
+    '-DOPENCC_ENABLE_INSTALL=ON',
+    '-DOPENCC_DICT_FORMAT=ocd2',
+  ]);
+  await _run(cmake, [
+    '--build',
+    hostBuild,
+    '--config',
+    'Release',
+    '--target',
+    'Dictionaries',
+    '--parallel',
+  ]);
+  await _run(cmake, ['--install', hostBuild, '--prefix', hostInstall]);
+  final resources = p.join(hostInstall, 'share', 'opencc');
+  if (!Directory(resources).existsSync()) {
+    throw StateError('Host OpenCC resources not found: $resources');
+  }
+  return resources;
+}
+
+void _installCrossTarget(
+  String target,
+  String install,
+  String build,
+  String resources,
+) {
+  final libraryName = _libraryFileName(target);
+  final librarySource = _findBuiltLibrary(build, libraryName);
+  final installLib = Directory(p.join(install, 'lib'))
+    ..createSync(recursive: true);
+  File(p.join(installLib.path, libraryName)).writeAsBytesSync(
+    librarySource.readAsBytesSync(),
+  );
+
+  final installResources = Directory(p.join(install, 'share', 'opencc'))
+    ..createSync(recursive: true);
+  final resourcesPath = p.normalize(p.absolute(resources));
+  for (final entity in Directory(resources).listSync(recursive: true)) {
+    if (entity is! File) continue;
+    final relative = p.relative(
+      p.normalize(p.absolute(entity.path)),
+      from: resourcesPath,
+    );
+    final targetFile = File(p.join(installResources.path, relative))
+      ..createSync(recursive: true);
+    entity.copySync(targetFile.path);
+  }
+}
+
+File _findBuiltLibrary(String build, String libraryName) {
+  final candidates = [
+    p.join(build, 'src', libraryName),
+    p.join(build, libraryName),
+  ];
+  for (final candidate in candidates) {
+    final file = File(candidate);
+    if (file.existsSync()) return file;
+  }
+  throw StateError('Library not found under $build: $libraryName');
 }
 
 Future<void> _run(String executable, List<String> arguments) async {

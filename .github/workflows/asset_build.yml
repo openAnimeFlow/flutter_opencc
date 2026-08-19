@@ -52,13 +52,18 @@ jobs:
           ref: ver.1.4.1
           path: third_party/opencc
 
-      - uses: subosito/flutter-action@v2
+      - name: Set up Flutter
+        if: matrix.name != 'linux-arm64'
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
 
-      - name: Install CMake
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y cmake
+      - name: Set up Flutter (Linux arm64)
+        if: matrix.name == 'linux-arm64'
+        run: |
+          git clone --depth 1 --branch stable https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+          flutter --version
 
       - name: Install CMake
         if: runner.os == 'macOS'
