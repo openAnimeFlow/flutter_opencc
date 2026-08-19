@@ -248,12 +248,12 @@ dev_dependencies:
 
 ## 12. CI
 
-- [ ] 创建原生库构建 workflow。
-- [ ] 创建 Dart 静态分析 workflow。
-- [ ] 创建 Windows/Linux/macOS 测试 workflow。
-- [ ] 创建 Android 构建测试 workflow。
-- [ ] 创建 iOS 构建测试 workflow。
-- [ ] 对 Release 产物做 SHA-256 校验。
+- [x] 创建原生库构建 workflow。
+- [x] 创建 Dart 静态分析 workflow。
+- [x] 创建 Windows/Linux/macOS 测试 workflow。
+- [x] 创建 Android 构建测试 workflow。
+- [x] 创建 iOS 构建测试 workflow。
+- [x] 对 Release 产物做 SHA-256 校验。
 - [ ] 验证多架构矩阵。
 - [ ] 验证缓存和失败重试。
 

@@ -1,0 +1,107 @@
+name: Build Native Assets
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'opencc-v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-latest
+          - name: windows-arm64
+            os: windows-latest
+          - name: linux-x64
+            os: ubuntu-latest
+          - name: linux-arm64
+            os: ubuntu-24.04-arm
+          - name: macos-x64
+            os: macos-13
+          - name: macos-arm64
+            os: macos-14
+          - name: ios-iphoneos-arm64
+            os: macos-14
+          - name: ios-iphonesimulator-arm64
+            os: macos-14
+          - name: android-arm64
+            os: ubuntu-latest
+          - name: android-arm
+            os: ubuntu-latest
+          - name: android-x64
+            os: ubuntu-latest
+          - name: android-x86
+            os: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout OpenCC
+        uses: actions/checkout@v4
+        with:
+          repository: BYVoid/OpenCC
+          ref: ver.1.4.1
+          path: third_party/opencc
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install CMake
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y cmake
+
+      - name: Install CMake
+        if: runner.os == 'macOS'
+        run: brew install cmake
+
+      - run: flutter pub get
+
+      - name: Build and package OpenCC
+        run: >-
+          dart tool/build_opencc.dart
+          --target ${{ matrix.name }}
+          --source third_party/opencc
+          --build build/opencc/${{ matrix.name }}
+          --install build/opencc/${{ matrix.name }}/install
+          --package build/opencc/${{ matrix.name }}/opencc-${{ matrix.name }}.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opencc-${{ matrix.name }}
+          path: |
+            build/opencc/${{ matrix.name }}/opencc-${{ matrix.name }}.zip
+            build/opencc/${{ matrix.name }}/opencc-${{ matrix.name }}.zip.sha256
+          retention-days: 14
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/opencc-v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+
+      - name: Verify SHA-256
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release
+          for file in *.zip; do
+            sha256sum -c "$file.sha256"
+          done
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.zip*

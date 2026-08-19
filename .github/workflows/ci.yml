@@ -1,0 +1,144 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  analyze:
+    name: Analyze ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+      - run: dart analyze
+      - run: cd example && flutter pub get && flutter analyze
+
+  test-desktop:
+    name: Test ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x64
+            os: ubuntu-latest
+          - name: windows-x64
+            os: windows-latest
+          - name: macos-x64
+            os: macos-13
+          - name: macos-arm64
+            os: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout OpenCC
+        uses: actions/checkout@v4
+        with:
+          repository: BYVoid/OpenCC
+          ref: ver.1.4.1
+          path: third_party/opencc
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install CMake
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y cmake
+
+      - name: Install CMake
+        if: runner.os == 'macOS'
+        run: brew install cmake
+
+      - run: flutter pub get
+
+      - name: Build local OpenCC
+        run: >-
+          dart tool/build_opencc.dart
+          --target ${{ matrix.name }}
+          --source third_party/opencc
+          --build build/opencc/${{ matrix.name }}
+          --install build/opencc/${{ matrix.name }}/install
+          --package build/opencc/${{ matrix.name }}/opencc-${{ matrix.name }}.zip
+
+      - run: dart test
+      - run: cd example && flutter pub get && flutter test
+
+  android-build:
+    name: Android build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout OpenCC
+        uses: actions/checkout@v4
+        with:
+          repository: BYVoid/OpenCC
+          ref: ver.1.4.1
+          path: third_party/opencc
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: sudo apt-get update && sudo apt-get install -y cmake
+      - run: flutter pub get
+
+      - name: Build Android OpenCC
+        run: >-
+          dart tool/build_opencc.dart
+          --target android-arm64
+          --source third_party/opencc
+          --build build/opencc/android-arm64
+          --install build/opencc/android-arm64/install
+          --package build/opencc/android-arm64/opencc-android-arm64.zip
+
+      - run: cd example && flutter pub get && flutter build apk --debug --target-platform android-arm64
+
+  ios-build:
+    name: iOS build
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout OpenCC
+        uses: actions/checkout@v4
+        with:
+          repository: BYVoid/OpenCC
+          ref: ver.1.4.1
+          path: third_party/opencc
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: brew install cmake
+      - run: flutter pub get
+
+      - name: Build iOS OpenCC
+        run: >-
+          dart tool/build_opencc.dart
+          --target ios-iphonesimulator-arm64
+          --source third_party/opencc
+          --build build/opencc/ios-iphonesimulator-arm64
+          --install build/opencc/ios-iphonesimulator-arm64/install
+          --package build/opencc/ios-iphonesimulator-arm64/opencc-ios-iphonesimulator-arm64.zip
+
+      - run: cd example && flutter pub get && flutter build ios --simulator --debug

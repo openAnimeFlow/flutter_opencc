@@ -30,6 +30,7 @@ void main(List<String> args) async {
       input,
       targetOS,
       targetArchitecture,
+      iOSSdk,
     );
     if (localDirectory != null) {
       final source = File.fromUri(localDirectory.resolve(libraryName));
@@ -100,6 +101,7 @@ Uri? _localPrebuiltDirectory(
   BuildInput input,
   OS targetOS,
   Architecture targetArchitecture,
+  IOSSdk? iOSSdk,
 ) {
   final userDefined = input.userDefines.path('local_dir');
   if (userDefined != null) {
@@ -108,15 +110,28 @@ Uri? _localPrebuiltDirectory(
   if (input.userDefines['base_url'] != null) {
     return null;
   }
-  if (targetOS == OS.windows && targetArchitecture == Architecture.x64) {
-    final developmentDirectory = input.packageRoot.resolve(
-      'build/opencc/windows-x64/install/bin',
-    );
-    if (Directory.fromUri(developmentDirectory).existsSync()) {
-      return Directory.fromUri(developmentDirectory).uri;
-    }
+  final relativeDirectory = switch ((targetOS.name, targetArchitecture.name)) {
+    ('windows', 'x64') => 'build/opencc/windows-x64/install/bin',
+    ('linux', 'x64') => 'build/opencc/linux-x64/install/lib',
+    ('linux', 'arm64') => 'build/opencc/linux-arm64/install/lib',
+    ('macOS', 'x64') => 'build/opencc/macos-x64/install/lib',
+    ('macOS', 'arm64') => 'build/opencc/macos-arm64/install/lib',
+    ('android', 'arm64') => 'build/opencc/android-arm64/install/lib',
+    ('android', 'arm') => 'build/opencc/android-arm/install/lib',
+    ('android', 'x64') => 'build/opencc/android-x64/install/lib',
+    ('android', 'ia32') => 'build/opencc/android-x86/install/lib',
+    ('ios', final architecture) when iOSSdk != null =>
+      'build/opencc/ios-${iOSSdk.type}-$architecture/install/lib',
+    _ => null,
+  };
+  if (relativeDirectory == null) {
+    return null;
   }
-  return null;
+  final developmentDirectory = input.packageRoot.resolve(relativeDirectory);
+  if (!Directory.fromUri(developmentDirectory).existsSync()) {
+    return null;
+  }
+  return Directory.fromUri(developmentDirectory).uri;
 }
 
 Future<void> _download(Uri uri, File target) async {
