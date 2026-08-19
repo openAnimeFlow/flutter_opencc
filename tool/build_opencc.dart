@@ -238,7 +238,10 @@ Future<String> _buildHostDictionaries(
     'opencc_phrase_extract',
     '--parallel',
   ]);
-  await _run(cmake, ['--install', hostBuild, '--prefix', hostInstall]);
+  await _run(
+    cmake,
+    ['--install', hostBuild, '--prefix', hostInstall, '--config', 'Release'],
+  );
   final resources = p.join(hostInstall, 'share', 'opencc');
   if (!Directory(resources).existsSync()) {
     throw StateError('Host OpenCC resources not found: $resources');
