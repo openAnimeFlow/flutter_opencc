@@ -76,6 +76,7 @@
 opencc-android-arm64.zip
 opencc-ios-iphoneos-arm64.zip
 opencc-ios-iphonesimulator-arm64.zip
+opencc-ios-iphonesimulator-x64.zip
 opencc-macos-arm64.zip
 opencc-macos-x64.zip
 opencc-windows-x64.zip

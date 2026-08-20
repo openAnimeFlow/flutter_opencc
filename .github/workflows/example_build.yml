@@ -47,7 +47,7 @@ jobs:
             os: macos-14
             opencc_target: ios-iphoneos-arm64
             build_command: flutter build ios --debug --no-codesign
-          - name: ios-simulator-arm64
+          - name: ios-simulator
             os: macos-14
             opencc_target: ios-iphonesimulator-arm64
             build_command: flutter build ios --simulator --debug
@@ -114,6 +114,16 @@ jobs:
           --build build/opencc/${{ matrix.opencc_target }}
           --install build/opencc/${{ matrix.opencc_target }}/install
           --package build/opencc/${{ matrix.opencc_target }}/opencc-${{ matrix.opencc_target }}.zip
+
+      - name: Build local OpenCC (x64 simulator)
+        if: matrix.name == 'ios-simulator'
+        run: >-
+          dart tool/build_opencc.dart
+          --target ios-iphonesimulator-x64
+          --source third_party/opencc
+          --build build/opencc/ios-iphonesimulator-x64
+          --install build/opencc/ios-iphonesimulator-x64/install
+          --package build/opencc/ios-iphonesimulator-x64/opencc-ios-iphonesimulator-x64.zip
 
       - name: Get example dependencies
         working-directory: example

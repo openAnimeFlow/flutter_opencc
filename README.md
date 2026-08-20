@@ -199,7 +199,7 @@ dart run flutter_opencc_plus -c s2t --data-dir assets/opencc "开放中文转换
 | 平台 | 架构 |
 | --- | --- |
 | Android | `arm64-v8a`、`armeabi-v7a`、`x86_64`、`x86` |
-| iOS | `arm64` 真机、`arm64` 模拟器 |
+| iOS | `arm64` 真机、`arm64`/`x64` 模拟器 |
 | macOS | `arm64`、`x64` |
 | Windows | `x64`、`arm64` |
 | Linux | `x64`、`arm64` |
@@ -215,6 +215,7 @@ opencc-android-x64.zip
 opencc-android-x86.zip
 opencc-ios-iphoneos-arm64.zip
 opencc-ios-iphonesimulator-arm64.zip
+opencc-ios-iphonesimulator-x64.zip
 opencc-macos-arm64.zip
 opencc-macos-x64.zip
 opencc-windows-x64.zip
