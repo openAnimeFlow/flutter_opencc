@@ -12,40 +12,21 @@ void main() {
 
   group('ZhConverter', () {
     test('converts simplified Chinese to traditional Chinese', () {
-      final converter = ZhConverter('s2t', dataDir: dataDir);
+      final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(converter.dispose);
 
       expect(converter.convert('开放中文转换 OpenCC'), '開放中文轉換 OpenCC');
     }, skip: skip);
 
     test('converts traditional Chinese to simplified Chinese', () {
-      final converter = ZhConverter('t2s', dataDir: dataDir);
+      final converter = ZhConverter(OpenCCConfig.t2s, dataDir: dataDir);
       addTearDown(converter.dispose);
 
       expect(converter.convert('鼠標與軟件 OpenCC'), '鼠标与软件 OpenCC');
     }, skip: skip);
 
     test('supports every OpenCC config name', () {
-      const configs = [
-        's2t',
-        't2s',
-        's2tw',
-        'tw2s',
-        's2hk',
-        'hk2s',
-        's2hkp',
-        'hk2sp',
-        's2twp',
-        'tw2sp',
-        't2tw',
-        'tw2t',
-        't2hk',
-        'hk2t',
-        't2jp',
-        'jp2t',
-      ];
-
-      for (final config in configs) {
+      for (final config in OpenCCConfig.values) {
         final converter = ZhConverter(config, dataDir: dataDir);
         addTearDown(converter.dispose);
 
@@ -54,10 +35,10 @@ void main() {
     }, skip: skip);
 
     test('supports Taiwan and Hong Kong phrase configs', () {
-      final s2twp = ZhConverter('s2twp', dataDir: dataDir);
-      final tw2sp = ZhConverter('tw2sp', dataDir: dataDir);
-      final s2hk = ZhConverter('s2hk', dataDir: dataDir);
-      final hk2s = ZhConverter('hk2s', dataDir: dataDir);
+      final s2twp = ZhConverter(OpenCCConfig.s2twp, dataDir: dataDir);
+      final tw2sp = ZhConverter(OpenCCConfig.tw2sp, dataDir: dataDir);
+      final s2hk = ZhConverter(OpenCCConfig.s2hk, dataDir: dataDir);
+      final hk2s = ZhConverter(OpenCCConfig.hk2s, dataDir: dataDir);
       addTearDown(s2twp.dispose);
       addTearDown(tw2sp.dispose);
       addTearDown(s2hk.dispose);
@@ -70,7 +51,7 @@ void main() {
     }, skip: skip);
 
     test('preserves empty and whitespace-only input', () {
-      final converter = ZhConverter('s2t', dataDir: dataDir);
+      final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(converter.dispose);
 
       for (final input in ['', ' ', '\t', '\n', ' \t\n ']) {
@@ -79,21 +60,21 @@ void main() {
     }, skip: skip);
 
     test('handles mixed Chinese, English, digits, and punctuation', () {
-      final converter = ZhConverter('s2t', dataDir: dataDir);
+      final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(converter.dispose);
 
       expect(converter.convert('OpenCC 开放中文转换 2026!'), 'OpenCC 開放中文轉換 2026!');
     }, skip: skip);
 
     test('handles multibyte UTF-8 including emoji', () {
-      final converter = ZhConverter('s2t', dataDir: dataDir);
+      final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(converter.dispose);
 
       expect(converter.convert('Hello 🙂 开放中文转换 🌏'), 'Hello 🙂 開放中文轉換 🌏');
     }, skip: skip);
 
     test('converts long multi-line text', () {
-      final converter = ZhConverter('s2t', dataDir: dataDir);
+      final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(converter.dispose);
 
       const line = '开放中文转换 OpenCC';
@@ -106,7 +87,7 @@ void main() {
 
     group('convertAll', () {
       test('converts multiple simplified texts to traditional Chinese', () {
-        final converter = ZhConverter('s2t', dataDir: dataDir);
+        final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
         addTearDown(converter.dispose);
 
         expect(
@@ -116,7 +97,7 @@ void main() {
       }, skip: skip);
 
       test('converts multiple traditional texts to simplified Chinese', () {
-        final converter = ZhConverter('t2s', dataDir: dataDir);
+        final converter = ZhConverter(OpenCCConfig.t2s, dataDir: dataDir);
         addTearDown(converter.dispose);
 
         expect(converter.convertAll(['開放中文轉換', '鼠標', '軟件']), [
@@ -127,7 +108,7 @@ void main() {
       }, skip: skip);
 
       test('handles empty, single-item, and mixed multiline inputs', () {
-        final converter = ZhConverter('s2t', dataDir: dataDir);
+        final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
         addTearDown(converter.dispose);
 
         expect(converter.convertAll([]), isEmpty);
@@ -175,7 +156,7 @@ void main() {
           '\uFEFF',
         ];
         final separatorText = separators.join();
-        final converter = ZhConverter('s2t', dataDir: dataDir);
+        final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
         addTearDown(converter.dispose);
 
         expect(
@@ -185,11 +166,18 @@ void main() {
       }, skip: skip);
     });
 
+    test('resolves built-in config names and json suffixes', () {
+      expect(OpenCCConfig.fromConfigName('s2t'), OpenCCConfig.s2t);
+      expect(OpenCCConfig.fromConfigName('s2t.json'), OpenCCConfig.s2t);
+      expect(OpenCCConfig.fromConfigName('custom'), isNull);
+    });
+
     test('rejects an unknown config', () {
       final resourcesDir = p.join('assets', 'opencc');
 
       expect(
-        () => ZhConverter('no_such_config', dataDir: resourcesDir),
+        () =>
+            ZhConverter.fromConfigName('no_such_config', dataDir: resourcesDir),
         throwsArgumentError,
       );
     });
@@ -198,7 +186,10 @@ void main() {
       final resourcesDir = p.join('assets', 'opencc');
 
       await expectLater(
-        ZhConverter.create('no_such_config', dataDir: resourcesDir),
+        ZhConverter.createFromConfigName(
+          'no_such_config',
+          dataDir: resourcesDir,
+        ),
         throwsArgumentError,
       );
     });
@@ -211,11 +202,14 @@ void main() {
       File(p.join(tempDir.path, 's2t.json')).writeAsStringSync('{}');
       File(p.join(tempDir.path, 'bad.json')).writeAsStringSync('not json');
 
-      expect(() => ZhConverter('bad', dataDir: tempDir.path), throwsStateError);
+      expect(
+        () => ZhConverter.fromConfigName('bad', dataDir: tempDir.path),
+        throwsStateError,
+      );
     }, skip: skip);
 
     test('dispose is idempotent and convert fails after dispose', () {
-      final converter = ZhConverter('s2t', dataDir: dataDir);
+      final converter = ZhConverter(OpenCCConfig.s2t, dataDir: dataDir);
 
       expect(converter.convert('开放中文转换'), '開放中文轉換');
       converter.dispose();
@@ -224,14 +218,14 @@ void main() {
     }, skip: skip);
 
     test('create resolves resources without an explicit dataDir', () async {
-      final converter = await ZhConverter.create('s2t');
+      final converter = await ZhConverter.create(OpenCCConfig.s2t);
       addTearDown(converter.dispose);
 
       expect(converter.convert('开放中文转换'), '開放中文轉換');
     }, skip: skip);
 
     test('constructor resolves filesystem resources without dataDir', () {
-      final converter = ZhConverter('s2t');
+      final converter = ZhConverter(OpenCCConfig.s2t);
       addTearDown(converter.dispose);
 
       expect(converter.convert('开放中文转换'), '開放中文轉換');

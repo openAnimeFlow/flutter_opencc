@@ -9,7 +9,7 @@ void main() {
 
   group('ZhTransformer', () {
     test('converts buffered chunks without a trailing newline', () async {
-      final transformer = ZhTransformer('s2t', dataDir: dataDir);
+      final transformer = ZhTransformer(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(transformer.dispose);
 
       final output = await Stream<String>.fromIterable([
@@ -21,7 +21,7 @@ void main() {
     }, skip: skip);
 
     test('handles a newline split across chunks', () async {
-      final transformer = ZhTransformer('s2t', dataDir: dataDir);
+      final transformer = ZhTransformer(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(transformer.dispose);
 
       final output = await Stream<String>.fromIterable([
@@ -34,7 +34,7 @@ void main() {
     }, skip: skip);
 
     test('preserves empty lines and whitespace-only lines', () async {
-      final transformer = ZhTransformer('s2t', dataDir: dataDir);
+      final transformer = ZhTransformer(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(transformer.dispose);
 
       final output = await Stream<String>.fromIterable([
@@ -47,7 +47,7 @@ void main() {
     }, skip: skip);
 
     test('handles CRLF line endings split across chunks', () async {
-      final transformer = ZhTransformer('s2t', dataDir: dataDir);
+      final transformer = ZhTransformer(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(transformer.dispose);
 
       final output = await Stream<String>.fromIterable([
@@ -59,7 +59,7 @@ void main() {
     }, skip: skip);
 
     test('ignores empty chunks', () async {
-      final transformer = ZhTransformer('s2t', dataDir: dataDir);
+      final transformer = ZhTransformer(OpenCCConfig.s2t, dataDir: dataDir);
       addTearDown(transformer.dispose);
 
       final output = await Stream<String>.fromIterable([
@@ -73,7 +73,7 @@ void main() {
     }, skip: skip);
 
     test('dispose is idempotent', () {
-      final transformer = ZhTransformer('s2t', dataDir: dataDir);
+      final transformer = ZhTransformer(OpenCCConfig.s2t, dataDir: dataDir);
 
       transformer.dispose();
       transformer.dispose();

@@ -48,7 +48,10 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final converter = await ZhConverter.create(config, dataDir: dataDir);
+  final converter = await ZhConverter.createFromConfigName(
+    config,
+    dataDir: dataDir,
+  );
   try {
     if (inputs.isEmpty) {
       final text = await utf8.decoder.bind(stdin).join();

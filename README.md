@@ -52,7 +52,7 @@ dependencies:
 import 'package:flutter_opencc/flutter_opencc.dart';
 
 void main() {
-  final converter = ZhConverter('s2t');
+  final converter = ZhConverter(OpenCCConfig.s2t);
   try {
     print(converter.convert('开放中文转换')); // 開放中文轉換
   } finally {
@@ -61,6 +61,10 @@ void main() {
 }
 ```
 
+内置配置通过 `OpenCCConfig` 枚举选择；如果确实需要自定义配置文件名，可以改用
+`ZhConverter.fromConfigName('my_config')` 或
+`ZhConverter.createFromConfigName('my_config')`。
+
 ### Flutter
 
 在 Flutter 应用中使用 package assets 时，优先使用异步创建方式：
@@ -68,7 +72,7 @@ void main() {
 ```dart
 import 'package:flutter_opencc/flutter_opencc.dart';
 
-final converter = await ZhConverter.create('s2t');
+final converter = await ZhConverter.create(OpenCCConfig.s2t);
 final output = converter.convert('鼠标与软件');
 converter.dispose();
 ```
@@ -76,7 +80,7 @@ converter.dispose();
 ### 流式转换
 
 ```dart
-final transformer = ZhTransformer('t2s');
+final transformer = ZhTransformer(OpenCCConfig.t2s);
 final chunks = Stream<String>.fromIterable(['開放中文', '轉換']);
 await for (final chunk in chunks.transform(transformer)) {
   print(chunk);
@@ -87,7 +91,7 @@ transformer.dispose();
 ### 批量转换
 
 ```dart
-final converter = ZhConverter('s2t');
+final converter = ZhConverter(OpenCCConfig.s2t);
 try {
   final outputs = converter.convertAll([
     '开放中文转换',
@@ -196,7 +200,8 @@ hooks:
 
 ## 示例工程
 
-完整演示应用位于 [example](example/)，支持 16 个配置、直接/流式转换和快捷示例：
+完整演示应用位于 [example](example/)，采用官网转换器布局，支持来源/目标语言、
+地域常用词、16 个配置档和差异高亮：
 
 ```bash
 cd example

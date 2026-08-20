@@ -8,13 +8,68 @@ import 'ffi.dart';
 import 'lib_opencc.dart' as bindings;
 import 'resources.dart';
 
+/// Built-in OpenCC conversion configs.
+///
+/// Pass one of these values to [ZhConverter] or [ZhTransformer]. Use
+/// [ZhConverter.fromConfigName] when a custom config file is required.
+enum OpenCCConfig {
+  s2t('s2t'),
+  t2s('t2s'),
+  s2tw('s2tw'),
+  tw2s('tw2s'),
+  s2hk('s2hk'),
+  hk2s('hk2s'),
+  s2hkp('s2hkp'),
+  hk2sp('hk2sp'),
+  s2twp('s2twp'),
+  tw2sp('tw2sp'),
+  t2tw('t2tw'),
+  tw2t('tw2t'),
+  t2hk('t2hk'),
+  hk2t('hk2t'),
+  t2jp('t2jp'),
+  jp2t('jp2t');
+
+  const OpenCCConfig(this.configName);
+
+  /// The config file name without the `.json` suffix.
+  final String configName;
+
+  /// Resolves a built-in config from [configName], accepting an optional
+  /// `.json` suffix. Returns `null` for unknown or custom configs.
+  static OpenCCConfig? fromConfigName(String configName) {
+    final normalized = configName.endsWith('.json')
+        ? configName.substring(0, configName.length - '.json'.length)
+        : configName;
+    for (final config in values) {
+      if (config.configName == normalized) {
+        return config;
+      }
+    }
+    return null;
+  }
+}
+
 /// Converts text between Chinese variants using OpenCC.
 ///
 /// One instance is not safe to share across isolates; create one per isolate.
 final class ZhConverter {
-  ZhConverter(String config, {String? dataDir})
+  ZhConverter(OpenCCConfig config, {String? dataDir})
     : _configPath = _resolveConfigPath(
-        config,
+        config.configName,
+        dataDir ?? _resolveSyncDataDir(),
+      ) {
+    _handle = _openConverter(_configPath);
+  }
+
+  /// Creates a converter for a custom config name.
+  factory ZhConverter.fromConfigName(String configName, {String? dataDir}) {
+    return ZhConverter._fromConfigName(configName, dataDir: dataDir);
+  }
+
+  ZhConverter._fromConfigName(String configName, {String? dataDir})
+    : _configPath = _resolveConfigPath(
+        configName,
         dataDir ?? _resolveSyncDataDir(),
       ) {
     _handle = _openConverter(_configPath);
@@ -22,9 +77,21 @@ final class ZhConverter {
 
   /// Resolves OpenCC resources, including Flutter assets, then opens a
   /// converter. Prefer this when no [dataDir] is supplied.
-  static Future<ZhConverter> create(String config, {String? dataDir}) async {
+  static Future<ZhConverter> create(
+    OpenCCConfig config, {
+    String? dataDir,
+  }) async {
     final resolved = await resolveOpenCCDataDir(dataDir: dataDir);
     return ZhConverter(config, dataDir: resolved);
+  }
+
+  /// Asynchronously creates a converter for a custom config name.
+  static Future<ZhConverter> createFromConfigName(
+    String configName, {
+    String? dataDir,
+  }) async {
+    final resolved = await resolveOpenCCDataDir(dataDir: dataDir);
+    return ZhConverter._fromConfigName(configName, dataDir: resolved);
   }
 
   final String _configPath;
@@ -171,13 +238,35 @@ const _batchSeparatorCandidates = [
 
 /// A stream transformer that converts text in chunks.
 final class ZhTransformer extends StreamTransformerBase<String, String> {
-  ZhTransformer(String config, {String? dataDir})
+  ZhTransformer(OpenCCConfig config, {String? dataDir})
     : _converter = ZhConverter(config, dataDir: dataDir);
+
+  /// Creates a transformer for a custom config name.
+  factory ZhTransformer.fromConfigName(String configName, {String? dataDir}) {
+    return ZhTransformer._fromConverter(
+      ZhConverter.fromConfigName(configName, dataDir: dataDir),
+    );
+  }
 
   /// Resolves OpenCC resources, including Flutter assets, then creates a
   /// transformer.
-  static Future<ZhTransformer> create(String config, {String? dataDir}) async {
+  static Future<ZhTransformer> create(
+    OpenCCConfig config, {
+    String? dataDir,
+  }) async {
     final converter = await ZhConverter.create(config, dataDir: dataDir);
+    return ZhTransformer._fromConverter(converter);
+  }
+
+  /// Asynchronously creates a transformer for a custom config name.
+  static Future<ZhTransformer> createFromConfigName(
+    String configName, {
+    String? dataDir,
+  }) async {
+    final converter = await ZhConverter.createFromConfigName(
+      configName,
+      dataDir: dataDir,
+    );
     return ZhTransformer._fromConverter(converter);
   }
 

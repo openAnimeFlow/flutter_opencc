@@ -401,8 +401,8 @@ final class ZhConverter {
   final CharArray _buf;
   bool _disposed = false;
 
-  ZhConverter(String config, {required String dataDir})
-    : this._(_open(dataDir, config));
+  ZhConverter(OpenCCConfig config, {required String dataDir})
+    : this._(_open(dataDir, config.configName));
 
   ZhConverter._(this._native, this._str, this._buf);
 
@@ -453,7 +453,7 @@ final class ZhConverter {
 final class ZhTransformer extends StreamTransformerBase<String, String> {
   final ZhConverter _converter;
 
-  ZhTransformer(String config, {required String dataDir})
+  ZhTransformer(OpenCCConfig config, {required String dataDir})
     : _converter = ZhConverter(config, dataDir: dataDir);
 
   @override
