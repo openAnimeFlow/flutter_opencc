@@ -2,6 +2,12 @@ name: Build Native Assets
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing opencc-v tag to update; leave empty for latest
+        required: false
+        type: string
+        default: ''
   push:
     tags:
       - 'opencc-v*'
@@ -91,7 +97,7 @@ jobs:
           retention-days: 14
 
   release:
-    if: startsWith(github.ref, 'refs/tags/opencc-v')
+    if: startsWith(github.ref, 'refs/tags/opencc-v') || github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -109,6 +115,36 @@ jobs:
             sha256sum -c "$file.sha256"
           done
 
-      - uses: softprops/action-gh-release@v3
-        with:
-          files: release/*.zip*
+      - name: Resolve release tag
+        id: release_tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            tag="${{ inputs.release_tag }}"
+            if [[ -z "$tag" ]]; then
+              tag="$(gh release list --repo "$GITHUB_REPOSITORY" --json tagName --jq '[.[] | select(.tagName | startswith("opencc-v"))][0].tagName')"
+            fi
+          else
+            tag="${GITHUB_REF_NAME}"
+          fi
+          if [[ -z "$tag" ]]; then
+            echo "No opencc-v release found." >&2
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Upload assets to release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release_tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" release/*.zip* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" release/*.zip* --title "$TAG" --repo "$GITHUB_REPOSITORY"
+          fi
