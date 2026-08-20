@@ -1,4 +1,4 @@
-import 'package:flutter_opencc/flutter_opencc.dart';
+import 'package:flutter_opencc_plus/flutter_opencc_plus.dart';
 import 'package:test/test.dart';
 
 import 'support/native_build.dart';

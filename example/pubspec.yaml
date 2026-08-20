@@ -1,5 +1,5 @@
-name: flutter_opencc_example
-description: Example app for flutter_opencc.
+name: flutter_opencc_plus_example
+description: Example app for flutter_opencc_plus.
 publish_to: none
 version: 0.1.0
 
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_opencc:
+  flutter_opencc_plus:
     path: ../
 
 dev_dependencies:

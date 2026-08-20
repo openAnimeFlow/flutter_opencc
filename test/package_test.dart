@@ -1,14 +1,14 @@
 import 'dart:io';
 
-import 'package:flutter_opencc/flutter_opencc.dart';
+import 'package:flutter_opencc_plus/flutter_opencc_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
-import 'package:flutter_opencc/src/resources.dart';
+import 'package:flutter_opencc_plus/src/resources.dart';
 
 void main() {
   test('package exposes its package name', () {
-    expect(packageName, 'flutter_opencc');
+    expect(packageName, 'flutter_opencc_plus');
   });
 
   group('resources', () {

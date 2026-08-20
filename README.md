@@ -1,8 +1,8 @@
-# flutter_opencc
+# flutter_opencc_plus
 
-[![Pub Version](https://img.shields.io/pub/v/flutter_opencc.svg)](https://pub.dev/packages/flutter_opencc)
-[![License](https://img.shields.io/github/license/openAnimeFlow/flutter_opencc.svg)](LICENSE)
-[![Native Assets](https://img.shields.io/github/actions/workflow/status/openAnimeFlow/flutter_opencc/asset_build.yml?branch=main&label=native%20assets)](https://github.com/openAnimeFlow/flutter_opencc/actions/workflows/asset_build.yml)
+[![Pub Version](https://img.shields.io/pub/v/flutter_opencc_plus.svg)](https://pub.dev/packages/flutter_opencc_plus)
+[![License](https://img.shields.io/github/license/openAnimeFlow/flutter_opencc_plus.svg)](LICENSE)
+[![Native Assets](https://img.shields.io/github/actions/workflow/status/openAnimeFlow/flutter_opencc_plus/asset_build.yml?branch=main&label=native%20assets)](https://github.com/openAnimeFlow/flutter_opencc_plus/actions/workflows/asset_build.yml)
 
 一个跨平台的 [OpenCC](https://github.com/BYVoid/OpenCC) Dart/Flutter 封装，用于简体中文、
 繁体中文、台湾/香港字形和常用词、日文新旧字体之间的转换。
@@ -34,23 +34,23 @@ build hook 使用 Dart/Flutter native asset bundling，从 Flutter 3.44 起该�
 包正式发布到 pub.dev 后，在项目中执行：
 
 ```bash
-flutter pub add flutter_opencc
+flutter pub add flutter_opencc_plus
 ```
 
 也可以直接添加到 `pubspec.yaml`：
 
 ```yaml
 dependencies:
-  flutter_opencc: ^0.1.0
+  flutter_opencc_plus: ^0.1.0
 ```
 
 当前开发阶段可以使用 Git 依赖：
 
 ```yaml
 dependencies:
-  flutter_opencc:
+  flutter_opencc_plus:
     git:
-      url: https://github.com/openAnimeFlow/flutter_opencc.git
+      url: https://github.com/openAnimeFlow/flutter_opencc_plus.git
       ref: main
 ```
 
@@ -59,7 +59,7 @@ dependencies:
 ### 基础转换
 
 ```dart
-import 'package:flutter_opencc/flutter_opencc.dart';
+import 'package:flutter_opencc_plus/flutter_opencc_plus.dart';
 
 void main() {
   final converter = ZhConverter(OpenCCConfig.s2t);
@@ -76,7 +76,7 @@ void main() {
 在 Flutter 应用中使用 package assets 时，优先使用异步创建方式：
 
 ```dart
-import 'package:flutter_opencc/flutter_opencc.dart';
+import 'package:flutter_opencc_plus/flutter_opencc_plus.dart';
 
 final converter = await ZhConverter.create(OpenCCConfig.s2t);
 final output = converter.convert('鼠标与软件');
@@ -172,25 +172,25 @@ List<String> convertAll(Iterable<String> texts);
 
 ```bash
 # 文本参数
-dart run flutter_opencc -c s2t "开放中文转换"
+dart run flutter_opencc_plus -c s2t "开放中文转换"
 
 # 文件参数，输出到 stdout
-dart run flutter_opencc -c t2s input.txt
+dart run flutter_opencc_plus -c t2s input.txt
 
 # 原地替换
-dart run flutter_opencc -c s2t -i notes.txt
+dart run flutter_opencc_plus -c s2t -i notes.txt
 
 # 标准输入
-echo "开放中文转换" | dart run flutter_opencc -c s2t
+echo "开放中文转换" | dart run flutter_opencc_plus -c s2t
 
 # 查看帮助
-dart run flutter_opencc -h
+dart run flutter_opencc_plus -h
 ```
 
 如果资源目录无法自动解析，可以显式指定：
 
 ```bash
-dart run flutter_opencc -c s2t --data-dir assets/opencc "开放中文转换"
+dart run flutter_opencc_plus -c s2t --data-dir assets/opencc "开放中文转换"
 ```
 
 ## Platform Support
@@ -230,7 +230,7 @@ opencc-linux-arm64.zip
 ```yaml
 hooks:
   user_defines:
-    flutter_opencc:
+    flutter_opencc_plus:
       base_url: https://example.com/releases
       local_dir: path/to/prebuilt/library
 ```

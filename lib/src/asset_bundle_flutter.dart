@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
 const bool hasFlutterAssetBundle = true;
-const String _assetPrefix = 'packages/flutter_opencc/assets/opencc/';
+const String _assetPrefix = 'packages/flutter_opencc_plus/assets/opencc/';
 
 Future<String?> extractOpenCCDataDirFromFlutterAssets() async {
   final cacheDirectory = Directory(
-    p.join(Directory.systemTemp.path, 'flutter_opencc_assets'),
+    p.join(Directory.systemTemp.path, 'flutter_opencc_plus_assets'),
   );
   if (File(p.join(cacheDirectory.path, 's2t.json')).existsSync()) {
     return cacheDirectory.path;

@@ -1,6 +1,6 @@
-# flutter_opencc example
+# flutter_opencc_plus example
 
-一个完整的 OpenCC 转换演示应用，展示 `flutter_opencc` 在 Flutter 中的用法。
+一个完整的 OpenCC 转换演示应用，展示 `flutter_opencc_plus` 在 Flutter 中的用法。
 
 ## 演示内容
 

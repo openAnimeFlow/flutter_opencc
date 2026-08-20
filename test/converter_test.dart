@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:flutter_opencc/flutter_opencc.dart';
+import 'package:flutter_opencc_plus/flutter_opencc_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
@@ -196,7 +196,7 @@ void main() {
 
     test('throws StateError for an invalid config file', () {
       final tempDir = Directory.systemTemp.createTempSync(
-        'flutter_opencc_invalid_config_',
+        'flutter_opencc_plus_invalid_config_',
       );
       addTearDown(() => tempDir.deleteSync(recursive: true));
       File(p.join(tempDir.path, 's2t.json')).writeAsStringSync('{}');

@@ -1,4 +1,4 @@
-# flutter_opencc 项目任务步骤清单
+# flutter_opencc_plus 项目任务步骤清单
 
 这份清单覆盖从项目初始化到发布维护的完整流程。每完成一项就勾选，并把每个阶段
 的验收标准跑通后再进入下一阶段。
@@ -6,7 +6,7 @@
 ## 0. 项目初始化与决策
 
 - [ ] 确定项目根目录，建议为 `C:\Coding\ProJect\flutter_opencc`。
-- [ ] 确定包名 `flutter_opencc`、版本号和发布范围。
+- [ ] 确定包名 `flutter_opencc_plus`、版本号和发布范围。
 - [x] 固定 OpenCC 版本为 `ver.1.4.1`，不使用 `master`。
 - [x] 确定发布策略：维护者/CI 构建预编译共享库，最终包只下载二进制。
 - [x] 确定词库资源策略：方案 A，Flutter package assets 打包词库。
@@ -135,7 +135,7 @@ dev_dependencies:
 完成标准：
 
 - 绑定文件自动生成且可编译。
-- asset id 默认为 `package:flutter_opencc/src/lib_opencc.dart`。
+- asset id 默认为 `package:flutter_opencc_plus/src/lib_opencc.dart`。
 
 ## 6. CharArray 与内存管理
 
@@ -221,7 +221,7 @@ dev_dependencies:
 
 完成标准：
 
-- 桌面端可以直接用 `dart run flutter_opencc` 完成转换。
+- 桌面端可以直接用 `dart run flutter_opencc_plus` 完成转换。
 - 文件和文本两种输入都可用。
 
 ## 11. 测试

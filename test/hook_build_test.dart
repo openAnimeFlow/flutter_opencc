@@ -23,7 +23,7 @@ void main() {
           expect(assets, hasLength(1));
           expect(
             assets.single.id,
-            'package:flutter_opencc/src/lib_opencc.dart',
+            'package:flutter_opencc_plus/src/lib_opencc.dart',
           );
           expect(assets.single.linkMode, isA<DynamicLoadingBundled>());
           expect(File.fromUri(assets.single.file!).existsSync(), isTrue);
@@ -46,7 +46,7 @@ void main() {
 
   test('downloads, verifies, and extracts a release zip', () async {
     final tempDir = await Directory.systemTemp.createTemp(
-      'flutter_opencc_hook_test_',
+      'flutter_opencc_plus_hook_test_',
     );
     addTearDown(() => tempDir.deleteSync(recursive: true));
 

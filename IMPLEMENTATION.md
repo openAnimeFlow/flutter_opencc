@@ -1,8 +1,8 @@
-# flutter_opencc 跨平台 OpenCC 封装实现文档
+# flutter_opencc_plus 跨平台 OpenCC 封装实现文档
 
 ## 1. 目标与范围
 
-`flutter_opencc` 是一个同时服务 Dart 和 Flutter 的 OpenCC 封装包，目标是让同一个
+`flutter_opencc_plus` 是一个同时服务 Dart 和 Flutter 的 OpenCC 封装包，目标是让同一个
 Dart API 在 Android、iOS、macOS、Windows、Linux 上转换简体中文和繁体中文。
 
 范围：
@@ -53,7 +53,7 @@ flowchart LR
 ## 4. 建议目录结构
 
 ```text
-flutter_opencc/
+flutter_opencc_plus/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml
@@ -65,15 +65,15 @@ flutter_opencc/
 │       ├── STPhrases.ocd2
 │       └── ...
 ├── bin/
-│   ├── flutter_opencc.dart
+│   ├── flutter_opencc_plus.dart
 │   └── opencc.dart
 ├── example/
-│   └── flutter_opencc_example/
+│   └── flutter_opencc_plus_example/
 ├── hook/
 │   ├── build.dart
 │   └── link.dart
 ├── lib/
-│   ├── flutter_opencc.dart
+│   ├── flutter_opencc_plus.dart
 │   └── src/
 │       ├── ffi.dart
 │       ├── lib_opencc.dart
@@ -96,7 +96,7 @@ flutter_opencc/
 ## 5. pubspec.yaml 基础配置
 
 ```yaml
-name: flutter_opencc
+name: flutter_opencc_plus
 description: A cross-platform OpenCC wrapper for Dart and Flutter.
 version: 0.1.0-dev.1
 publish_to: none
@@ -126,7 +126,7 @@ flutter:
 - `code_assets` 和 `hooks` 是 build hook 依赖。
 - `archive` 用于解压预编译产物。
 - 资源放在 `assets/opencc/`，由 Flutter package assets 自动打包。
-- 消费方访问路径是 `packages/flutter_opencc/assets/opencc/s2t.json`。
+- 消费方访问路径是 `packages/flutter_opencc_plus/assets/opencc/s2t.json`。
 
 ## 6. OpenCC 原生库构建矩阵
 
@@ -284,7 +284,7 @@ import 'package:hooks/hooks.dart';
 
 const _libName = 'opencc';
 const _baseUrl =
-    'https://github.com/openAnimeFlow/flutter_opencc/releases/latest/download';
+    'https://github.com/openAnimeFlow/flutter_opencc_plus/releases/latest/download';
 
 void main(List<String> args) async {
   await build(args, (input, output) async {
@@ -384,7 +384,7 @@ external opencc_t opencc_open(
 ```
 
 因为绑定文件在 `lib/src/lib_opencc.dart`，默认 asset id 是
-`package:flutter_opencc/src/lib_opencc.dart`，和 build hook 中注册的 code asset
+`package:flutter_opencc_plus/src/lib_opencc.dart`，和 build hook 中注册的 code asset
 名称一致。
 
 ## 10. Dart API 设计
@@ -499,11 +499,11 @@ OpenCC 的 `opencc_open` 只接收配置文件名，资源查找依赖配置所�
 
 ```dart
 Future<String> prepareDataDir() async {
-  final root = Directory.systemTemp.createTempSync('flutter_opencc_');
+  final root = Directory.systemTemp.createTempSync('flutter_opencc_plus_');
   final names = await _listOpenCCAssets();
   for (final name in names) {
     final data = await rootBundle.load(
-      'packages/flutter_opencc/assets/opencc/$name',
+      'packages/flutter_opencc_plus/assets/opencc/$name',
     );
     final file = File('${root.path}/$name');
     await file.writeAsBytes(data.buffer.asUint8List(), flush: true);

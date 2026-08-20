@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_opencc/flutter_opencc.dart';
+import 'package:flutter_opencc_plus/flutter_opencc_plus.dart';
 
 const _usage = '''
-Usage: dart run flutter_opencc [options] [<text|file>...]
+Usage: dart run flutter_opencc_plus [options] [<text|file>...]
 
 Options:
   -c, --config <name>   OpenCC config name (default: s2t)

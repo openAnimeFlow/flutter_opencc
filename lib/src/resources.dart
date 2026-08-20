@@ -28,7 +28,7 @@ Future<String> resolveOpenCCDataDir({String? dataDir}) async {
   }
   throw StateError(
     'OpenCC resources not found. Pass dataDir, or use ZhConverter.create() '
-    'inside a Flutter app that declares the flutter_opencc assets.',
+    'inside a Flutter app that declares the flutter_opencc_plus assets.',
   );
 }
 
@@ -88,8 +88,7 @@ String? _packageRootFromConfig() {
     return null;
   }
   final configUri = Uri.parse(configUriText);
-  if (!configUri.isScheme('file') ||
-      !File(p.fromUri(configUri)).existsSync()) {
+  if (!configUri.isScheme('file') || !File(p.fromUri(configUri)).existsSync()) {
     return null;
   }
   try {
@@ -103,7 +102,7 @@ String? _packageRootFromConfig() {
     }
     for (final entry in packages) {
       if (entry is Map<String, dynamic> &&
-          entry['name'] == 'flutter_opencc' &&
+          entry['name'] == 'flutter_opencc_plus' &&
           entry['rootUri'] is String) {
         final rootUri = configUri.resolveUri(
           Uri.parse(entry['rootUri'] as String),

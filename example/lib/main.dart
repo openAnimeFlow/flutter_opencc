@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_opencc/flutter_opencc.dart';
+import 'package:flutter_opencc_plus/flutter_opencc_plus.dart';
 
 void main() {
   runApp(const OpenCCExampleApp());
@@ -484,7 +484,7 @@ class _ConverterPageState extends State<_ConverterPage> {
                   ),
                 ),
                 Text(
-                  'flutter_opencc 转换工具',
+                  'flutter_opencc_plus 转换工具',
                   style: Theme.of(
                     context,
                   ).textTheme.bodySmall?.copyWith(color: _textSub),
@@ -741,7 +741,7 @@ class _ConverterPageState extends State<_ConverterPage> {
       child: Column(
         children: [
           Text(
-            'OpenCC 1.4.1 · flutter_opencc',
+            'OpenCC 1.4.1 · flutter_opencc_plus',
             style: Theme.of(
               context,
             ).textTheme.bodySmall?.copyWith(color: const Color(0xFF9CA3AF)),
