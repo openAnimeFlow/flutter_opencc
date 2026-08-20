@@ -87,6 +87,7 @@ class _ConverterPage extends StatefulWidget {
 
 class _ConverterPageState extends State<_ConverterPage> {
   final _inputController = TextEditingController(text: '开放中文转换 OpenCC');
+  final _batchController = TextEditingController(text: '开放中文转换\n鼠标与软件\n网络');
   Timer? _debounce;
   Timer? _copiedTimer;
   String _source = 's';
@@ -99,6 +100,9 @@ class _ConverterPageState extends State<_ConverterPage> {
   String? _error;
   String _status = '就绪';
   int _conversionVersion = 0;
+  bool _batchBusy = false;
+  String _batchOutput = '';
+  String? _batchError;
 
   @override
   void initState() {
@@ -111,6 +115,7 @@ class _ConverterPageState extends State<_ConverterPage> {
     _debounce?.cancel();
     _copiedTimer?.cancel();
     _inputController.dispose();
+    _batchController.dispose();
     super.dispose();
   }
 
@@ -197,6 +202,51 @@ class _ConverterPageState extends State<_ConverterPage> {
     final converter = await ZhConverter.create(config);
     try {
       return converter.convert(input);
+    } finally {
+      converter.dispose();
+    }
+  }
+
+  Future<void> _convertBatch() async {
+    if (_batchBusy) {
+      return;
+    }
+    final config = _resolvedConfig;
+    final lines = _batchController.text.split('\n');
+    setState(() {
+      _batchBusy = true;
+      _batchOutput = '';
+      _batchError = null;
+    });
+    try {
+      final outputs = config == null
+          ? lines
+          : await _convertBatchWith(config, lines);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _batchOutput = outputs.join('\n');
+        _batchBusy = false;
+      });
+    } catch (error) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _batchError = '$error';
+        _batchBusy = false;
+      });
+    }
+  }
+
+  Future<List<String>> _convertBatchWith(
+    OpenCCConfig config,
+    List<String> lines,
+  ) async {
+    final converter = await ZhConverter.create(config);
+    try {
+      return converter.convertAll(lines);
     } finally {
       converter.dispose();
     }
@@ -390,6 +440,7 @@ class _ConverterPageState extends State<_ConverterPage> {
                   _buildHeader(),
                   _buildModeSection(),
                   _buildEditor(),
+                  _buildBatchSection(),
                   _buildFooter(),
                 ],
               ),
@@ -600,6 +651,85 @@ class _ConverterPageState extends State<_ConverterPage> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildBatchSection() {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: colors.outlineVariant)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.format_list_bulleted_rounded,
+                color: colors.primary,
+                size: 22,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  '批量转换',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: _textMain,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              FilledButton.icon(
+                key: const ValueKey('batch-convert'),
+                onPressed: _batchBusy ? null : _convertBatch,
+                icon: _batchBusy
+                    ? const SizedBox.square(
+                        dimension: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.playlist_add_check_rounded, size: 18),
+                label: Text(_batchBusy ? '转换中' : '转换全部'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final input = _BatchInputPane(controller: _batchController);
+              final output = _BatchOutputPane(
+                output: _batchOutput,
+                error: _batchError,
+              );
+              if (constraints.maxWidth >= 720) {
+                return SizedBox(
+                  height: 220,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: input),
+                      const SizedBox(width: 16),
+                      Expanded(child: output),
+                    ],
+                  ),
+                );
+              }
+              return Column(
+                children: [
+                  SizedBox(height: 220, child: input),
+                  const SizedBox(height: 16),
+                  SizedBox(height: 220, child: output),
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -889,6 +1019,105 @@ class _PhraseOption extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _BatchInputPane extends StatelessWidget {
+  const _BatchInputPane({required this.controller});
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: _border),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          const _EditorHeader(title: '批量输入', actions: []),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+              child: TextField(
+                key: const ValueKey('batch-input'),
+                controller: controller,
+                maxLines: null,
+                expands: true,
+                textAlignVertical: TextAlignVertical.top,
+                style: const TextStyle(
+                  color: _textMain,
+                  fontSize: 16,
+                  height: 1.6,
+                ),
+                decoration: const InputDecoration.collapsed(
+                  hintText: '请输入多条文本',
+                  hintStyle: TextStyle(color: Color(0xFFD1D5DB)),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BatchOutputPane extends StatelessWidget {
+  const _BatchOutputPane({required this.output, required this.error});
+
+  final String output;
+  final String? error;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: _border),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          const _EditorHeader(title: '批量输出', actions: []),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: SingleChildScrollView(
+                  child: error != null
+                      ? SelectableText(
+                          error!,
+                          style: const TextStyle(
+                            color: Color(0xFF991B1B),
+                            fontSize: 16,
+                            height: 1.6,
+                          ),
+                        )
+                      : output.isEmpty
+                      ? Text(
+                          '—',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.outline,
+                            fontSize: 24,
+                          ),
+                        )
+                      : SelectableText(
+                          output,
+                          style: const TextStyle(
+                            color: _textMain,
+                            fontSize: 16,
+                            height: 1.6,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

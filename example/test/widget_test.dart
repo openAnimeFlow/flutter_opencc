@@ -12,6 +12,9 @@ void main() {
     expect(find.text('选择转换模式'), findsOneWidget);
     expect(find.text('输入原文'), findsOneWidget);
     expect(find.text('转换结果'), findsOneWidget);
+    expect(find.text('批量转换'), findsOneWidget);
+    expect(find.text('批量输入'), findsOneWidget);
+    expect(find.text('批量输出'), findsOneWidget);
     expect(find.text('简体中文 (s)'), findsOneWidget);
     expect(find.byKey(const ValueKey('来源 (Source)-s')), findsOneWidget);
     expect(find.byKey(const ValueKey('目标 (Target)-t')), findsOneWidget);
@@ -72,5 +75,22 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('config-s2twp')));
     await tester.pumpAndSettle();
     expect(find.text('s2twp.json'), findsOneWidget);
+  });
+
+  testWidgets('converts multiple lines through convertAll', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const OpenCCExampleApp());
+
+    await tester.ensureVisible(find.byKey(const ValueKey('batch-convert')));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(const ValueKey('batch-convert')));
+      await tester.pump();
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+    });
+    await tester.pumpAndSettle();
+
+    expect(find.text('開放中文轉換\n鼠標與軟件\n網絡'), findsOneWidget);
   });
 }
