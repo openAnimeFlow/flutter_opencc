@@ -1,40 +1,50 @@
 # flutter_opencc
 
-`flutter_opencc` 是一个跨平台的 [OpenCC](https://github.com/BYVoid/OpenCC)
-Dart/Flutter 封装，提供简体中文、繁体中文、台湾/香港字形和常用词、日文新旧字体
-之间的转换能力。
+[![Pub Version](https://img.shields.io/pub/v/flutter_opencc.svg)](https://pub.dev/packages/flutter_opencc)
+[![License](https://img.shields.io/github/license/openAnimeFlow/flutter_opencc.svg)](LICENSE)
+[![Native Assets](https://img.shields.io/github/actions/workflow/status/openAnimeFlow/flutter_opencc/asset_build.yml?branch=main&label=native%20assets)](https://github.com/openAnimeFlow/flutter_opencc/actions/workflows/asset_build.yml)
 
-原生共享库由维护者在 GitHub Actions 中预编译，并通过 GitHub Release 分发。应用
-构建时由 build hook 自动下载对应平台的 zip，因此使用者不需要安装 C++ 工具链、
-NDK 或 Xcode。
+一个跨平台的 [OpenCC](https://github.com/BYVoid/OpenCC) Dart/Flutter 封装，用于简体中文、
+繁体中文、台湾/香港字形和常用词、日文新旧字体之间的转换。
 
-## 特性
+原生共享库由 GitHub Actions 预编译并通过 GitHub Release 分发。应用构建时由 build hook
+自动下载对应平台产物，使用者不需要安装 C++ 工具链、NDK 或 Xcode。
 
-- 支持 16 个 OpenCC 1.4.1 配置。
-- 提供同步 `ZhConverter` 和流式 `ZhTransformer` 两个 API。
+## Features
+
+- 支持全部 16 个 OpenCC 1.4.1 配置。
+- 提供同步 `ZhConverter`、流式 `ZhTransformer` 和批量 `convertAll` API。
 - 支持 Android、iOS、macOS、Windows、Linux。
 - 词库资源随 Flutter package assets 打包，运行时自动解析。
 - 不依赖 `OPENCC_SHARED_DIR` 等环境变量。
-- 内置 CLI，支持文本、文件、标准输入输出和原地替换。
+- 内置 CLI，支持文本参数、文件、标准输入输出和原地替换。
+- 非汉字内容会原样保留，包括标点、英文、数字、换行和 Emoji。
 
-## 环境要求
+## Requirements
 
 | 组件 | 版本 |
 | --- | --- |
 | Dart SDK | `>=3.10.0 <4.0.0` |
-| Flutter | `>=3.35.0`，建议使用最新 stable |
+| Flutter | `>=3.35.0` |
 
-构建 hook 使用 Dart/Flutter native asset bundling，从 3.44 起该功能已经稳定。
+build hook 使用 Dart/Flutter native asset bundling，从 Flutter 3.44 起该功能已稳定。
 
-## 安装
+## Installation
 
-发布到 pub.dev 后，在项目中执行：
+包正式发布到 pub.dev 后，在项目中执行：
 
 ```bash
 flutter pub add flutter_opencc
 ```
 
-当前开发阶段也可以使用 Git 依赖：
+也可以直接添加到 `pubspec.yaml`：
+
+```yaml
+dependencies:
+  flutter_opencc: ^0.1.0
+```
+
+当前开发阶段可以使用 Git 依赖：
 
 ```yaml
 dependencies:
@@ -44,9 +54,9 @@ dependencies:
       ref: main
 ```
 
-## 快速开始
+## Usage
 
-### Dart
+### 基础转换
 
 ```dart
 import 'package:flutter_opencc/flutter_opencc.dart';
@@ -60,10 +70,6 @@ void main() {
   }
 }
 ```
-
-内置配置通过 `OpenCCConfig` 枚举选择；如果确实需要自定义配置文件名，可以改用
-`ZhConverter.fromConfigName('my_config')` 或
-`ZhConverter.createFromConfigName('my_config')`。
 
 ### Flutter
 
@@ -82,6 +88,7 @@ converter.dispose();
 ```dart
 final transformer = ZhTransformer(OpenCCConfig.t2s);
 final chunks = Stream<String>.fromIterable(['開放中文', '轉換']);
+
 await for (final chunk in chunks.transform(transformer)) {
   print(chunk);
 }
@@ -104,12 +111,22 @@ try {
 }
 ```
 
-`convertAll` 会优先用控制字符作为分隔符，把多条文本合并后只调用一次底层
-OpenCC API；如果所有候选分隔符都出现在输入中，再回退为逐条转换，保证结果正确。
+`convertAll` 会优先选择一个输入中不存在的控制字符作为分隔符，合并后只调用一次底层
+OpenCC API；如果所有候选分隔符都出现在输入中，会自动回退为逐条转换。
 
-一个转换实例不应跨 isolate 共享；每个 isolate 创建自己的 `ZhConverter`。
+### 自定义配置
 
-## 支持配置
+内置配置通过 `OpenCCConfig` 枚举选择。需要加载自定义配置文件时，可以使用：
+
+```dart
+final converter = ZhConverter.fromConfigName('my_config');
+```
+
+异步场景使用 `ZhConverter.createFromConfigName('my_config')`。
+
+注意：一个转换实例不应跨 isolate 共享，每个 isolate 应创建自己的 `ZhConverter`。
+
+## Supported Configurations
 
 | 配置 | 说明 |
 | --- | --- |
@@ -129,6 +146,27 @@ OpenCC API；如果所有候选分隔符都出现在输入中，再回退为逐�
 | `hk2t` | 香港繁体转标准繁体 |
 | `t2jp` | 旧日文汉字转新字体 |
 | `jp2t` | 新字体转旧日文汉字 |
+
+## API
+
+### `OpenCCConfig`
+
+内置配置枚举，包含上述 16 个配置。每个枚举值通过 `configName` 获取不带 `.json`
+后缀的配置文件名。
+
+### `ZhConverter`
+
+同步转换器。
+
+```dart
+String convert(String text);
+List<String> convertAll(Iterable<String> texts);
+```
+
+### `ZhTransformer`
+
+流式转换器，继承自 `StreamTransformerBase<String, String>`，按换行边界拆分并转换
+输入流。
 
 ## CLI
 
@@ -155,20 +193,19 @@ dart run flutter_opencc -h
 dart run flutter_opencc -c s2t --data-dir assets/opencc "开放中文转换"
 ```
 
-## 平台支持
+## Platform Support
 
 | 平台 | 架构 |
 | --- | --- |
 | Android | `arm64-v8a`、`armeabi-v7a`、`x86_64`、`x86` |
-| iOS | `arm64` 真机、`arm64`/`x64` 模拟器 |
+| iOS | `arm64` 真机、`arm64` 模拟器 |
 | macOS | `arm64`、`x64` |
 | Windows | `x64`、`arm64` |
 | Linux | `x64`、`arm64` |
 
-## 原生库与 Release
+## Native Assets
 
-每次 OpenCC 版本更新时，维护者推送 `opencc-v<版本>` tag，GitHub Actions 会构建并
-发布以下产物：
+每次 OpenCC 版本更新时，维护者推送 `opencc-v<版本>` tag，GitHub Actions 会构建并发布：
 
 ```text
 opencc-android-arm64.zip
@@ -185,7 +222,7 @@ opencc-linux-x64.zip
 opencc-linux-arm64.zip
 ```
 
-每个 zip 都附带 `.sha256` 文件。build hook 会下载对应平台的 zip、校验 SHA-256、
+每个 zip 都附带 `.sha256` 文件。build hook 会下载对应平台产物、校验 SHA-256、
 解压共享库并注册为 native code asset。
 
 开发时可以通过 `hooks.user_defines` 覆盖默认行为：
@@ -198,9 +235,9 @@ hooks:
       local_dir: path/to/prebuilt/library
 ```
 
-## 示例工程
+## Example
 
-完整演示应用位于 [example](example/)，采用官网转换器布局，支持来源/目标语言、
+完整演示应用位于 [example](example/)，采用 OpenCC 官网转换器布局，支持来源/目标语言、
 地域常用词、16 个配置档、差异高亮和 `convertAll` 批量转换：
 
 ```bash
@@ -209,13 +246,9 @@ flutter pub get
 flutter run
 ```
 
-## 开发与维护
+## Additional Information
 
-- [IMPLEMENTATION.md](IMPLEMENTATION.md)：完整实现说明。
-- [TASKS.md](TASKS.md)：发布前任务清单。
+- [IMPLEMENTATION.md](IMPLEMENTATION.md)：实现说明。
 - [CONTRIBUTING.md](CONTRIBUTING.md)：贡献指南。
-
-## License
-
-本项目使用 [Apache License 2.0](LICENSE)，其中包含 OpenCC 预编译库和词库资源，
-OpenCC 的相关归属信息见 [NOTICE](NOTICE)。
+- [TASKS.md](TASKS.md)：发布前任务清单。
+- [LICENSE](LICENSE) 和 [NOTICE](NOTICE)：许可证与 OpenCC 归属信息。
