@@ -72,6 +72,22 @@ void main() {
 }
 ```
 
+### 作用域自动释放
+
+一次性转换可以使用 `run`，转换完成后会自动释放原生 handle，不需要手动调用
+`dispose()`：
+
+```dart
+final output = await ZhConverter.run(
+  OpenCCConfig.s2t,
+  (converter) => converter.convert('开放中文转换'),
+);
+print(output); // 開放中文轉換
+```
+
+`ZhConverter.runFromConfigName` 和 `ZhTransformer.run` / `runFromConfigName`
+使用同样的作用域自动释放方式。
+
 ### Flutter
 
 在 Flutter 应用中使用 package assets 时，优先使用异步创建方式：

@@ -199,12 +199,7 @@ class _ConverterPageState extends State<_ConverterPage> {
   }
 
   Future<String> _convertWith(OpenCCConfig config, String input) async {
-    final converter = await ZhConverter.create(config);
-    try {
-      return converter.convert(input);
-    } finally {
-      converter.dispose();
-    }
+    return ZhConverter.run(config, (converter) => converter.convert(input));
   }
 
   Future<void> _convertBatch() async {
@@ -244,12 +239,7 @@ class _ConverterPageState extends State<_ConverterPage> {
     OpenCCConfig config,
     List<String> lines,
   ) async {
-    final converter = await ZhConverter.create(config);
-    try {
-      return converter.convertAll(lines);
-    } finally {
-      converter.dispose();
-    }
+    return ZhConverter.run(config, (converter) => converter.convertAll(lines));
   }
 
   void _onInputChanged(String value) {

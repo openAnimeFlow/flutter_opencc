@@ -78,5 +78,35 @@ void main() {
       transformer.dispose();
       transformer.dispose();
     }, skip: skip);
+
+    test('run disposes the transformer automatically', () async {
+      ZhTransformer? captured;
+      final output = await ZhTransformer.run(OpenCCConfig.s2t, (
+        transformer,
+      ) async {
+        captured = transformer;
+        final chunks = await Stream<String>.fromIterable([
+          '开放中文',
+        ]).transform(transformer).toList();
+        return chunks.join();
+      }, dataDir: dataDir);
+
+      expect(output, '開放中文');
+      captured!.dispose();
+      captured!.dispose();
+    }, skip: skip);
+
+    test('runFromConfigName disposes the transformer automatically', () async {
+      final output = await ZhTransformer.runFromConfigName('t2s', (
+        transformer,
+      ) async {
+        final chunks = await Stream<String>.fromIterable([
+          '開放中文',
+        ]).transform(transformer).toList();
+        return chunks.join();
+      }, dataDir: dataDir);
+
+      expect(output, '开放中文');
+    }, skip: skip);
   });
 }

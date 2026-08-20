@@ -52,8 +52,16 @@ enum OpenCCConfig {
 
 /// Converts text between Chinese variants using OpenCC.
 ///
+/// Each instance owns a native OpenCC handle. Prefer [ZhConverter.run] for
+/// one-shot work (it disposes the converter automatically), or call [dispose]
+/// exactly once when the converter is no longer needed.
+///
 /// One instance is not safe to share across isolates; create one per isolate.
 final class ZhConverter {
+  /// Opens a converter synchronously.
+  ///
+  /// The caller must call [dispose] exactly once when the converter is no
+  /// longer needed, or use [ZhConverter.run] to release it automatically.
   ZhConverter(OpenCCConfig config, {String? dataDir})
     : _configPath = _resolveConfigPath(
         config.configName,
@@ -63,6 +71,10 @@ final class ZhConverter {
   }
 
   /// Creates a converter for a custom config name.
+  ///
+  /// The caller must call [dispose] exactly once when the converter is no
+  /// longer needed, or use [ZhConverter.runFromConfigName] to release it
+  /// automatically.
   factory ZhConverter.fromConfigName(String configName, {String? dataDir}) {
     return ZhConverter._fromConfigName(configName, dataDir: dataDir);
   }
@@ -77,6 +89,9 @@ final class ZhConverter {
 
   /// Resolves OpenCC resources, including Flutter assets, then opens a
   /// converter. Prefer this when no [dataDir] is supplied.
+  ///
+  /// The caller must call [dispose] exactly once when the converter is no
+  /// longer needed, or use [ZhConverter.run] to release it automatically.
   static Future<ZhConverter> create(
     OpenCCConfig config, {
     String? dataDir,
@@ -86,12 +101,46 @@ final class ZhConverter {
   }
 
   /// Asynchronously creates a converter for a custom config name.
+  ///
+  /// The caller must call [dispose] exactly once when the converter is no
+  /// longer needed, or use [ZhConverter.runFromConfigName] to release it
+  /// automatically.
   static Future<ZhConverter> createFromConfigName(
     String configName, {
     String? dataDir,
   }) async {
     final resolved = await resolveOpenCCDataDir(dataDir: dataDir);
     return ZhConverter._fromConfigName(configName, dataDir: resolved);
+  }
+
+  /// Creates a converter, runs [action], and disposes the converter
+  /// automatically when [action] completes, even if it throws.
+  static Future<R> run<R>(
+    OpenCCConfig config,
+    FutureOr<R> Function(ZhConverter converter) action, {
+    String? dataDir,
+  }) async {
+    final converter = await create(config, dataDir: dataDir);
+    try {
+      return await action(converter);
+    } finally {
+      converter.dispose();
+    }
+  }
+
+  /// Creates a converter from a custom config name, runs [action], and
+  /// disposes the converter automatically when [action] completes.
+  static Future<R> runFromConfigName<R>(
+    String configName,
+    FutureOr<R> Function(ZhConverter converter) action, {
+    String? dataDir,
+  }) async {
+    final converter = await createFromConfigName(configName, dataDir: dataDir);
+    try {
+      return await action(converter);
+    } finally {
+      converter.dispose();
+    }
   }
 
   final String _configPath;
@@ -153,6 +202,10 @@ final class ZhConverter {
     }
   }
 
+  /// Releases the native OpenCC handle.
+  ///
+  /// This method is idempotent. The converter cannot be used after it returns.
+  /// Callers using [ZhConverter.run] do not need to call this method.
   void dispose() {
     if (_disposed) {
       return;
@@ -237,11 +290,23 @@ const _batchSeparatorCandidates = [
 ];
 
 /// A stream transformer that converts text in chunks.
+///
+/// Each instance owns a native OpenCC handle. Prefer [ZhTransformer.run] for
+/// one-shot work (it disposes the transformer automatically), or call
+/// [dispose] exactly once when the transformer is no longer needed.
 final class ZhTransformer extends StreamTransformerBase<String, String> {
+  /// Creates a transformer synchronously.
+  ///
+  /// The caller must call [dispose] exactly once when the transformer is no
+  /// longer needed, or use [ZhTransformer.run] to release it automatically.
   ZhTransformer(OpenCCConfig config, {String? dataDir})
     : _converter = ZhConverter(config, dataDir: dataDir);
 
   /// Creates a transformer for a custom config name.
+  ///
+  /// The caller must call [dispose] exactly once when the transformer is no
+  /// longer needed, or use [ZhTransformer.runFromConfigName] to release it
+  /// automatically.
   factory ZhTransformer.fromConfigName(String configName, {String? dataDir}) {
     return ZhTransformer._fromConverter(
       ZhConverter.fromConfigName(configName, dataDir: dataDir),
@@ -250,6 +315,9 @@ final class ZhTransformer extends StreamTransformerBase<String, String> {
 
   /// Resolves OpenCC resources, including Flutter assets, then creates a
   /// transformer.
+  ///
+  /// The caller must call [dispose] exactly once when the transformer is no
+  /// longer needed, or use [ZhTransformer.run] to release it automatically.
   static Future<ZhTransformer> create(
     OpenCCConfig config, {
     String? dataDir,
@@ -259,6 +327,10 @@ final class ZhTransformer extends StreamTransformerBase<String, String> {
   }
 
   /// Asynchronously creates a transformer for a custom config name.
+  ///
+  /// The caller must call [dispose] exactly once when the transformer is no
+  /// longer needed, or use [ZhTransformer.runFromConfigName] to release it
+  /// automatically.
   static Future<ZhTransformer> createFromConfigName(
     String configName, {
     String? dataDir,
@@ -268,6 +340,39 @@ final class ZhTransformer extends StreamTransformerBase<String, String> {
       dataDir: dataDir,
     );
     return ZhTransformer._fromConverter(converter);
+  }
+
+  /// Creates a transformer, runs [action], and disposes the transformer
+  /// automatically when [action] completes, even if it throws.
+  static Future<R> run<R>(
+    OpenCCConfig config,
+    FutureOr<R> Function(ZhTransformer transformer) action, {
+    String? dataDir,
+  }) async {
+    final transformer = await create(config, dataDir: dataDir);
+    try {
+      return await action(transformer);
+    } finally {
+      transformer.dispose();
+    }
+  }
+
+  /// Creates a transformer from a custom config name, runs [action], and
+  /// disposes the transformer automatically when [action] completes.
+  static Future<R> runFromConfigName<R>(
+    String configName,
+    FutureOr<R> Function(ZhTransformer transformer) action, {
+    String? dataDir,
+  }) async {
+    final transformer = await createFromConfigName(
+      configName,
+      dataDir: dataDir,
+    );
+    try {
+      return await action(transformer);
+    } finally {
+      transformer.dispose();
+    }
   }
 
   ZhTransformer._fromConverter(this._converter);
@@ -295,6 +400,10 @@ final class ZhTransformer extends StreamTransformerBase<String, String> {
     }
   }
 
+  /// Releases the underlying converter.
+  ///
+  /// This method is idempotent. Callers using [ZhTransformer.run] do not need
+  /// to call this method.
   void dispose() => _converter.dispose();
 }
 

@@ -217,6 +217,42 @@ void main() {
       expect(() => converter.convert('开放中文转换'), throwsStateError);
     }, skip: skip);
 
+    test('run disposes the converter automatically', () async {
+      ZhConverter? captured;
+      final output = await ZhConverter.run(OpenCCConfig.s2t, (converter) {
+        captured = converter;
+        return converter.convert('开放中文转换');
+      }, dataDir: dataDir);
+
+      expect(output, '開放中文轉換');
+      expect(() => captured!.convert('开放中文转换'), throwsStateError);
+    }, skip: skip);
+
+    test('run disposes the converter when action throws', () async {
+      ZhConverter? captured;
+
+      await expectLater(
+        ZhConverter.run(OpenCCConfig.s2t, (converter) {
+          captured = converter;
+          throw StateError('boom');
+        }, dataDir: dataDir),
+        throwsStateError,
+      );
+
+      expect(() => captured!.convert('开放中文转换'), throwsStateError);
+    }, skip: skip);
+
+    test('runFromConfigName disposes the converter automatically', () async {
+      ZhConverter? captured;
+      final output = await ZhConverter.runFromConfigName('s2t', (converter) {
+        captured = converter;
+        return converter.convert('开放中文转换');
+      }, dataDir: dataDir);
+
+      expect(output, '開放中文轉換');
+      expect(() => captured!.convert('开放中文转换'), throwsStateError);
+    }, skip: skip);
+
     test('create resolves resources without an explicit dataDir', () async {
       final converter = await ZhConverter.create(OpenCCConfig.s2t);
       addTearDown(converter.dispose);
