@@ -33,6 +33,39 @@ final class ZhConverter {
 
   String convert(String text) {
     _ensureOpen();
+    return _convertRaw(text);
+  }
+
+  /// Converts a batch of texts with a single native call when possible.
+  ///
+  /// The implementation joins the inputs with a control-character separator
+  /// that does not appear in any input, calls the OpenCC C API once, and splits
+  /// the result. If no safe separator is available, it falls back to one native
+  /// call per item.
+  List<String> convertAll(Iterable<String> texts) {
+    _ensureOpen();
+    final inputs = texts.toList(growable: false);
+    if (inputs.isEmpty) {
+      return const [];
+    }
+    if (inputs.length == 1) {
+      return [convert(inputs.single)];
+    }
+
+    final separator = _batchSeparator(inputs);
+    if (separator == null) {
+      return [for (final text in inputs) _convertRaw(text)];
+    }
+
+    final output = _convertRaw(inputs.join(separator));
+    final parts = output.split(separator);
+    if (parts.length != inputs.length) {
+      return [for (final text in inputs) _convertRaw(text)];
+    }
+    return parts;
+  }
+
+  String _convertRaw(String text) {
     final input = CharArray.fromString(text);
     try {
       final output = bindings.opencc_convert_utf8(
@@ -75,6 +108,22 @@ final class ZhConverter {
     return error.cast<Utf8>().toDartString();
   }
 
+  String? _batchSeparator(List<String> inputs) {
+    for (final separator in _batchSeparatorCandidates) {
+      var used = false;
+      for (final input in inputs) {
+        if (input.contains(separator)) {
+          used = true;
+          break;
+        }
+      }
+      if (!used) {
+        return separator;
+      }
+    }
+    return null;
+  }
+
   static String _resolveConfigPath(String config, String dataDir) {
     final name = config.endsWith('.json') ? config : '$config.json';
     final path = p.join(dataDir, name);
@@ -84,6 +133,41 @@ final class ZhConverter {
     return path;
   }
 }
+
+const _batchSeparatorCandidates = [
+  '\u0001',
+  '\u0002',
+  '\u0003',
+  '\u0004',
+  '\u0005',
+  '\u0006',
+  '\u0007',
+  '\u0008',
+  '\u000B',
+  '\u000C',
+  '\u000E',
+  '\u000F',
+  '\u0010',
+  '\u0011',
+  '\u0012',
+  '\u0013',
+  '\u0014',
+  '\u0015',
+  '\u0016',
+  '\u0017',
+  '\u0018',
+  '\u0019',
+  '\u001A',
+  '\u001B',
+  '\u001C',
+  '\u001D',
+  '\u001E',
+  '\u001F',
+  '\u007F',
+  '\u2028',
+  '\u2029',
+  '\uFEFF',
+];
 
 /// A stream transformer that converts text in chunks.
 final class ZhTransformer extends StreamTransformerBase<String, String> {

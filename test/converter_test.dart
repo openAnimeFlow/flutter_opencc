@@ -104,6 +104,87 @@ void main() {
       expect(converter.convert(input), expected);
     }, skip: skip);
 
+    group('convertAll', () {
+      test('converts multiple simplified texts to traditional Chinese', () {
+        final converter = ZhConverter('s2t', dataDir: dataDir);
+        addTearDown(converter.dispose);
+
+        expect(
+          converter.convertAll(['开放中文转换', '鼠标', '软件', 'OpenCC 2026!', '']),
+          ['開放中文轉換', '鼠標', '軟件', 'OpenCC 2026!', ''],
+        );
+      }, skip: skip);
+
+      test('converts multiple traditional texts to simplified Chinese', () {
+        final converter = ZhConverter('t2s', dataDir: dataDir);
+        addTearDown(converter.dispose);
+
+        expect(converter.convertAll(['開放中文轉換', '鼠標', '軟件']), [
+          '开放中文转换',
+          '鼠标',
+          '软件',
+        ]);
+      }, skip: skip);
+
+      test('handles empty, single-item, and mixed multiline inputs', () {
+        final converter = ZhConverter('s2t', dataDir: dataDir);
+        addTearDown(converter.dispose);
+
+        expect(converter.convertAll([]), isEmpty);
+        expect(converter.convertAll(['开放中文转换']), ['開放中文轉換']);
+        expect(converter.convertAll(['开放中文转换\nOpenCC', '你好 🙂', '']), [
+          '開放中文轉換\nOpenCC',
+          '你好 🙂',
+          '',
+        ]);
+      }, skip: skip);
+
+      test('falls back per item when every separator is used', () {
+        const separators = [
+          '\u0001',
+          '\u0002',
+          '\u0003',
+          '\u0004',
+          '\u0005',
+          '\u0006',
+          '\u0007',
+          '\u0008',
+          '\u000B',
+          '\u000C',
+          '\u000E',
+          '\u000F',
+          '\u0010',
+          '\u0011',
+          '\u0012',
+          '\u0013',
+          '\u0014',
+          '\u0015',
+          '\u0016',
+          '\u0017',
+          '\u0018',
+          '\u0019',
+          '\u001A',
+          '\u001B',
+          '\u001C',
+          '\u001D',
+          '\u001E',
+          '\u001F',
+          '\u007F',
+          '\u2028',
+          '\u2029',
+          '\uFEFF',
+        ];
+        final separatorText = separators.join();
+        final converter = ZhConverter('s2t', dataDir: dataDir);
+        addTearDown(converter.dispose);
+
+        expect(
+          converter.convertAll(['开放中文转换$separatorText', '鼠标$separatorText软件']),
+          ['開放中文轉換$separatorText', '鼠標$separatorText軟件'],
+        );
+      }, skip: skip);
+    });
+
     test('rejects an unknown config', () {
       final resourcesDir = p.join('assets', 'opencc');
 

@@ -84,6 +84,25 @@ await for (final chunk in chunks.transform(transformer)) {
 transformer.dispose();
 ```
 
+### 批量转换
+
+```dart
+final converter = ZhConverter('s2t');
+try {
+  final outputs = converter.convertAll([
+    '开放中文转换',
+    '鼠标与软件',
+    'OpenCC 2026!',
+  ]);
+  print(outputs); // [開放中文轉換, 鼠標與軟件, OpenCC 2026!]
+} finally {
+  converter.dispose();
+}
+```
+
+`convertAll` 会优先用控制字符作为分隔符，把多条文本合并后只调用一次底层
+OpenCC API；如果所有候选分隔符都出现在输入中，再回退为逐条转换，保证结果正确。
+
 一个转换实例不应跨 isolate 共享；每个 isolate 创建自己的 `ZhConverter`。
 
 ## 支持配置
