@@ -10,24 +10,63 @@ import 'resources.dart';
 
 /// Built-in OpenCC conversion configs.
 ///
+/// Each value maps to one of OpenCC's built-in `.json` config files and
+/// defines both the direction of the conversion and the target regional
+/// variant (Mainland China, Taiwan, Hong Kong, or Japanese kanji).
+///
 /// Pass one of these values to [ZhConverter] or [ZhTransformer]. Use
 /// [ZhConverter.fromConfigName] when a custom config file is required.
 enum OpenCCConfig {
+  /// Simplified Chinese to Traditional Chinese.
   s2t('s2t'),
+
+  /// Traditional Chinese to Simplified Chinese.
   t2s('t2s'),
+
+  /// Simplified Chinese to Traditional Chinese in Taiwan standard.
   s2tw('s2tw'),
+
+  /// Traditional Chinese (Taiwan standard) to Simplified Chinese.
   tw2s('tw2s'),
+
+  /// Simplified Chinese to Traditional Chinese in Hong Kong standard.
   s2hk('s2hk'),
+
+  /// Traditional Chinese (Hong Kong standard) to Simplified Chinese.
   hk2s('hk2s'),
+
+  /// Simplified Chinese to Traditional Chinese in Hong Kong standard,
+  /// applying Hong Kong phrases.
   s2hkp('s2hkp'),
+
+  /// Traditional Chinese (Hong Kong standard) to Simplified Chinese,
+  /// applying Mainland Chinese phrases.
   hk2sp('hk2sp'),
+
+  /// Simplified Chinese to Traditional Chinese in Taiwan standard,
+  /// applying Taiwan phrases.
   s2twp('s2twp'),
+
+  /// Traditional Chinese (Taiwan standard) to Simplified Chinese,
+  /// applying Mainland Chinese phrases.
   tw2sp('tw2sp'),
+
+  /// Traditional Chinese to Taiwan-standard Traditional Chinese.
   t2tw('t2tw'),
+
+  /// Taiwan-standard Traditional Chinese to Traditional Chinese.
   tw2t('tw2t'),
+
+  /// Traditional Chinese to Hong Kong-standard Traditional Chinese.
   t2hk('t2hk'),
+
+  /// Hong Kong-standard Traditional Chinese to Traditional Chinese.
   hk2t('hk2t'),
+
+  /// Traditional Chinese to Japanese shinjitai kanji.
   t2jp('t2jp'),
+
+  /// Japanese shinjitai kanji to Traditional Chinese.
   jp2t('jp2t');
 
   const OpenCCConfig(this.configName);
