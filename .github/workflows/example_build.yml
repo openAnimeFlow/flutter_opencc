@@ -1,0 +1,124 @@
+name: Example Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: example-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  example-build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-latest
+            opencc_target: windows-x64
+            build_command: flutter build windows --debug
+          - name: linux-x64
+            os: ubuntu-latest
+            opencc_target: linux-x64
+            build_command: flutter build linux --debug
+          - name: linux-arm64
+            os: ubuntu-24.04-arm
+            opencc_target: linux-arm64
+            build_command: flutter build linux --debug
+          - name: macos-x64
+            os: macos-15-intel
+            opencc_target: macos-x64
+            build_command: flutter build macos --debug
+          - name: macos-arm64
+            os: macos-14
+            opencc_target: macos-arm64
+            build_command: flutter build macos --debug
+          - name: ios-device-arm64
+            os: macos-14
+            opencc_target: ios-iphoneos-arm64
+            build_command: flutter build ios --debug --no-codesign
+          - name: ios-simulator-arm64
+            os: macos-14
+            opencc_target: ios-iphonesimulator-arm64
+            build_command: flutter build ios --simulator --debug
+          - name: android-arm64
+            os: ubuntu-latest
+            opencc_target: android-arm64
+            build_command: flutter build apk --debug --target-platform android-arm64
+          - name: android-arm
+            os: ubuntu-latest
+            opencc_target: android-arm
+            build_command: flutter build apk --debug --target-platform android-arm
+          - name: android-x64
+            os: ubuntu-latest
+            opencc_target: android-x64
+            build_command: flutter build apk --debug --target-platform android-x64
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Checkout OpenCC
+        uses: actions/checkout@v5
+        with:
+          repository: BYVoid/OpenCC
+          ref: ver.1.4.1
+          path: third_party/opencc
+
+      - name: Set up Flutter
+        if: matrix.name != 'linux-arm64'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Set up Flutter (Linux arm64)
+        if: matrix.name == 'linux-arm64'
+        run: |
+          git clone --depth 1 --branch stable https://github.com/flutter/flutter.git "$HOME/flutter"
+          echo "$HOME/flutter/bin" >> "$GITHUB_PATH"
+          "$HOME/flutter/bin/flutter" --version
+
+      - name: Set up Java
+        if: startsWith(matrix.name, 'android')
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install CMake
+        if: runner.os == 'macOS'
+        run: brew install cmake
+
+      - name: Install Linux desktop dependencies
+        if: startsWith(matrix.name, 'linux')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - run: flutter pub get
+
+      - name: Build local OpenCC
+        run: >-
+          dart tool/build_opencc.dart
+          --target ${{ matrix.opencc_target }}
+          --source third_party/opencc
+          --build build/opencc/${{ matrix.opencc_target }}
+          --install build/opencc/${{ matrix.opencc_target }}/install
+          --package build/opencc/${{ matrix.opencc_target }}/opencc-${{ matrix.opencc_target }}.zip
+
+      - name: Get example dependencies
+        working-directory: example
+        run: flutter pub get
+
+      - name: Build example
+        working-directory: example
+        run: ${{ matrix.build_command }}

@@ -3,6 +3,7 @@
 [![Pub Version](https://img.shields.io/pub/v/flutter_opencc_plus.svg)](https://pub.dev/packages/flutter_opencc_plus)
 [![License](https://img.shields.io/github/license/openAnimeFlow/flutter_opencc_plus.svg)](LICENSE)
 [![Native Assets](https://img.shields.io/github/actions/workflow/status/openAnimeFlow/flutter_opencc_plus/asset_build.yml?branch=main&label=native%20assets)](https://github.com/openAnimeFlow/flutter_opencc_plus/actions/workflows/asset_build.yml)
+[![Example Build](https://img.shields.io/github/actions/workflow/status/openAnimeFlow/flutter_opencc_plus/example_build.yml?branch=main&label=example%20build)](https://github.com/openAnimeFlow/flutter_opencc_plus/actions/workflows/example_build.yml)
 
 一个跨平台的 [OpenCC](https://github.com/BYVoid/OpenCC) Dart/Flutter 封装，用于简体中文、
 繁体中文、台湾/香港字形和常用词、日文新旧字体之间的转换。
