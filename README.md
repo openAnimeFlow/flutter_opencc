@@ -32,7 +32,7 @@ build hook 使用 Dart/Flutter native asset bundling，从 Flutter 3.44 起该�
 
 ## Installation
 
-包正式发布到 pub.dev 后，在项目中执行：
+在项目中执行：
 
 ```bash
 flutter pub add flutter_opencc_plus
@@ -43,16 +43,6 @@ flutter pub add flutter_opencc_plus
 ```yaml
 dependencies:
   flutter_opencc_plus: ^0.1.0
-```
-
-当前开发阶段可以使用 Git 依赖：
-
-```yaml
-dependencies:
-  flutter_opencc_plus:
-    git:
-      url: https://github.com/openAnimeFlow/flutter_opencc_plus.git
-      ref: main
 ```
 
 ## Usage
