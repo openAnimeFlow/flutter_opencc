@@ -1,6 +1,6 @@
 name: flutter_opencc_plus
 description: A cross-platform OpenCC wrapper for Dart and Flutter.
-version: 0.1.0
+version: 0.1.1
 
 repository: https://github.com/openAnimeFlow/flutter_opencc_plus
 homepage: https://github.com/openAnimeFlow/flutter_opencc_plus

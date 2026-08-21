@@ -1,2 +1,4 @@
 docs/
 third_party/opencc/
+build/
+tool/build-out/

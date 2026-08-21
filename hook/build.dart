@@ -93,8 +93,10 @@ String _archiveName(
   Architecture targetArchitecture,
   IOSSdk? iOSSdk,
 ) {
-  final sdkSuffix = iOSSdk == null ? '' : '-${iOSSdk.type}';
-  return 'opencc-${targetOS.name}-${targetArchitecture.name}$sdkSuffix.zip';
+  if (iOSSdk != null) {
+    return 'opencc-${targetOS.name}-${iOSSdk.type}-${targetArchitecture.name}.zip';
+  }
+  return 'opencc-${targetOS.name}-${targetArchitecture.name}.zip';
 }
 
 Uri? _localPrebuiltDirectory(
