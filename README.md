@@ -42,7 +42,7 @@ flutter pub add flutter_opencc_plus
 
 ```yaml
 dependencies:
-  flutter_opencc_plus: ^0.1.0
+  flutter_opencc_plus: ^0.1.1
 ```
 
 ## Usage
