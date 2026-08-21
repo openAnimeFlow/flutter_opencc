@@ -98,7 +98,7 @@ flutter_opencc_plus/
 ```yaml
 name: flutter_opencc_plus
 description: A cross-platform OpenCC wrapper for Dart and Flutter.
-version: 0.1.0-dev.1
+version: 0.1.0
 publish_to: none
 
 environment:

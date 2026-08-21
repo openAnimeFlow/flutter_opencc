@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.1.0-dev.1
+## 0.1.0
 
-- 首个开发版本，尚未发布到 pub.dev。
+- 首个正式发布版本。
 - 支持全部 16 个 OpenCC 1.4.1 内置配置。
 - 提供同步 `ZhConverter`、流式 `ZhTransformer` 和批量 `convertAll` API。
 - 提供 `run` / `runFromConfigName` 作用域 API，自动释放原生句柄。
