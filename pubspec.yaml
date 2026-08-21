@@ -3,6 +3,9 @@ description: A cross-platform OpenCC wrapper for Dart and Flutter.
 version: 0.1.0-dev.1
 publish_to: none
 
+repository: https://github.com/openAnimeFlow/flutter_opencc_plus
+homepage: https://github.com/openAnimeFlow/flutter_opencc_plus
+
 environment:
   sdk: '>=3.10.0 <4.0.0'
   flutter: '>=3.35.0'
