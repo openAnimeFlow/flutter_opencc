@@ -268,5 +268,5 @@ flutter run
 
 - [IMPLEMENTATION.md](IMPLEMENTATION.md)：实现说明。
 - [CONTRIBUTING.md](CONTRIBUTING.md)：贡献指南。
-- [TASKS.md](TASKS.md)：发布前任务清单。
+- [TASKS.md](docs/TASKS.md)：发布前任务清单（已归档）。
 - [LICENSE](LICENSE) 和 [NOTICE](NOTICE)：许可证与 OpenCC 归属信息。

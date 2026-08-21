@@ -1,7 +1,7 @@
 # Contributing
 
 感谢你愿意为 `flutter_opencc_plus` 贡献代码。提交前请先阅读
-[IMPLEMENTATION.md](IMPLEMENTATION.md) 和 [TASKS.md](TASKS.md)，保持实现方式和
+[IMPLEMENTATION.md](IMPLEMENTATION.md) 和 [docs/TASKS.md](docs/TASKS.md)，保持实现方式和
 任务清单同步更新。
 
 ## 环境准备
